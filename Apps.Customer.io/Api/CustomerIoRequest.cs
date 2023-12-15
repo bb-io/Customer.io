@@ -15,7 +15,7 @@ public class CustomerIoRequest : BlackBirdRestRequest
 
     protected override void AddAuth(IEnumerable<AuthenticationCredentialsProvider> creds)
     {
-        var token = creds.Get(CredsNames.ApiKey);
+        var token = creds.Get(CredsNames.ApiKey).Value;
         this.AddHeader("Authorization", $"Bearer {token}");
     }
 }

@@ -2,9 +2,9 @@ using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Utils.Json.Converters;
 using Newtonsoft.Json;
 
-namespace Apps.Customer.io.Models.Request.TransactionalMessage;
+namespace Apps.Customer.io.Models.Request.Newsletter;
 
-public class UpdateMessageTranslationRequest
+public class UpdateNewsletterTranslationRequest
 {
     public string? Body { get; set; }
 
@@ -17,6 +17,8 @@ public class UpdateMessageTranslationRequest
     public string? ReplyToId { get; set; }
 
     public string? Subject { get; set; }
+    
+    public string? Recipient { get; set; }
 
     [Display("Preheader Text")]
     public string? PreheaderText { get; set; }

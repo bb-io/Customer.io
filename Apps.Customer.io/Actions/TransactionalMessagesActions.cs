@@ -1,6 +1,7 @@
 using Apps.Customer.io.Api;
 using Apps.Customer.io.Constants;
 using Apps.Customer.io.Invocables;
+using Apps.Customer.io.Models.Entity;
 using Apps.Customer.io.Models.Request.TransactionalMessage;
 using Apps.Customer.io.Models.Response.TransactionalMessage;
 using Blackbird.Applications.Sdk.Common;
@@ -18,18 +19,19 @@ public class TransactionalMessagesActions : CustomerIoInvocable
     {
     }
 
-    [Action("Get a translation of a transactional message", Description = "Get information about a translation of an individual transactional message")]
-    public Task<ListMessageTranslationResponse> ListTransactionalMessageTranslation(
+    [Action("Get translation of a transactional message", Description = "Get information about a translation of an individual transactional message")]
+    public async Task<EmailTemplateEntity> GetTransactionalMessageTranslation(
         [ActionParameter] TransactionalMessageTranslationRequest input)
     {
         var endpoint = $"v1/transactional/{input.TransactionalMessageId}/language/{input.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
 
-        return Client.ExecuteWithErrorHandling<ListMessageTranslationResponse>(request);
+        var response = await Client.ExecuteWithErrorHandling<ListMessageTranslationResponse>(request);
+        return response.Content;
     }
     
-    [Action("Update a translation of a transactional message", Description = "Update the body and other data of a specific language variant for a transactional message")]
-    public Task<ListMessageTranslationResponse> UpdateTransactionalMessageTranslation(
+    [Action("Update translation of a transactional message", Description = "Update the body and other data of a specific language variant for a transactional message")]
+    public async Task<EmailTemplateEntity> UpdateTransactionalMessageTranslation(
         [ActionParameter] TransactionalMessageTranslationRequest input,
         [ActionParameter] UpdateMessageTranslationRequest payload)
     {
@@ -37,6 +39,7 @@ public class TransactionalMessagesActions : CustomerIoInvocable
         var request = new CustomerIoRequest(endpoint, Method.Put, Creds)
             .WithJsonBody(payload, JsonConfig.Settings);
 
-        return Client.ExecuteWithErrorHandling<ListMessageTranslationResponse>(request);
+        var response = await Client.ExecuteWithErrorHandling<ListMessageTranslationResponse>(request);
+        return response.Content;
     }
 }

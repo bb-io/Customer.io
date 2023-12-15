@@ -23,6 +23,9 @@ public class CustomerIoClient : BlackBirdRestClient
         var content = response.Content!;
         var error = JsonConvert.DeserializeObject<ErrorResponse>(content)!;
 
+        if (error.Errors is not null)
+            return new(string.Join(';', error.Errors.Select(x => x.Detail)));
+        
         return new(error.Meta.Error);
     }
 }

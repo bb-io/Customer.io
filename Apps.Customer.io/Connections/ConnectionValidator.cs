@@ -1,5 +1,7 @@
-﻿using Blackbird.Applications.Sdk.Common.Authentication;
+﻿using Apps.Customer.io.Api;
+using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Connections;
+using RestSharp;
 
 namespace Apps.Customer.io.Connections;
 
@@ -9,6 +11,25 @@ public class ConnectionValidator: IConnectionValidator
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
         CancellationToken cancellationToken)
     {
-        return new();
+        var client = new CustomerIoClient();
+
+        try
+        {
+            var request = new CustomerIoRequest("v1/transactional", Method.Get, authenticationCredentialsProviders);
+            await client.ExecuteWithErrorHandling(request);
+
+            return new()
+            {
+                IsValid = true
+            };
+        }
+        catch (Exception ex)
+        {
+            return new()
+            {
+                IsValid = false,
+                Message = ex.Message
+            };
+        }
     }
 }

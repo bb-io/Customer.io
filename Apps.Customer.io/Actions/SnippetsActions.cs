@@ -13,9 +13,9 @@ using RestSharp;
 namespace Apps.Customer.io.Actions;
 
 [ActionList]
-public class SnippetActions : CustomerIoInvocable
+public class SnippetsActions : CustomerIoInvocable
 {
-    public SnippetActions(InvocationContext invocationContext) : base(invocationContext)
+    public SnippetsActions(InvocationContext invocationContext) : base(invocationContext)
     {
     }
 

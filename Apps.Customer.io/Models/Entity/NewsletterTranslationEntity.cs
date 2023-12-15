@@ -1,33 +1,32 @@
 using Apps.Customer.io.Models.Response;
 using Blackbird.Applications.Sdk.Common;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Apps.Customer.io.Models.Entity;
 
-public class EmailTemplateEntity
+public class NewsletterTranslationEntity
 {
     [Display("ID")]
     public string Id { get; set; }
 
-    [Display("Name")]
+    [Display("Newsletter ID")]
+    public string NewsletterId { get; set; }
+
+    [Display("Deduplicate ID")]
+    public string DeduplicateId { get; set; }
+
     public string Name { get; set; }
-
-    [Display("Creation date")]
-    [JsonConverter(typeof(UnixDateTimeConverter))]
-    public DateTime? Created { get; set; }
-
-    [Display("Last updated")]
-    [JsonConverter(typeof(UnixDateTimeConverter))]
-    public DateTime? Updated { get; set; }
-
+    
+    public string Layout { get; set; }
+    
     public string Body { get; set; }
 
-    public string Language { get; set; }
+    [Display("Amp Body")]
+    public string BodyAmp { get; set; }
 
+    public string Language { get; set; }
+    
     public string Type { get; set; }
 
-    [Display("From")]
     public string From { get; set; }
 
     [Display("From ID")]
@@ -40,11 +39,11 @@ public class EmailTemplateEntity
     public string ReplyToId { get; set; }
 
     public string Preprocessor { get; set; }
-
+    
     public string Recipient { get; set; }
-
+    
     public string Subject { get; set; }
-
+    
     [Display("BCC")]
     public string Bcc { get; set; }
 
@@ -55,7 +54,4 @@ public class EmailTemplateEntity
     public string PreheaderText { get; set; }
 
     public List<EmailHeader> Headers { get; set; }
-
-    [Display("Amp body")]
-    public string BodyAmp { get; set; }
 }
