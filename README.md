@@ -6,7 +6,35 @@ Blackbird is the new automation backbone for the language technology industry. B
 
 <!-- begin docs -->
 
-Documentation coming soon.
+Customer.io is a platform that enables businesses to send targeted and personalized messages to their customers via various communication channels such as email, SMS, and push notifications. It allows businesses to create automated campaigns based on user behavior, preferences, and interactions with the company's website or app.
+
+## Before setting up
+
+Before you can connect you need to make sure that:
+
+- You have a Customer.io account and have either admin or workspace manager rights.
+- You have an API key for your Customer.io account. You can find your API credentials in Customer.io under _Settings_ > _Account Settings_ > _API Credentials_. More information about API keys can be found [here](https://customer.io/docs/accounts-and-workspaces/managing-credentials/).
+
+## Connecting
+
+1. Navigate to apps and search for Customer.io. If you cannot find Customer.io then click _Add App_ in the top right corner, select Customer.io and add the app to your Blackbird environment.
+2. Click _Add Connection_.
+3. Name your connection for future reference e.g. 'My Customer.io connection'.
+4. Fill in the API key to the Customer.io instance you want to connect to.
+7. Click _Connect_.
+
+![CustomerioBlackbirdConnection](image/README/CustomerioBlackbirdConnection.png)
+
+## Actions
+
+- **Get translation of a broadcast message** Get information about a translation of message in a broadcast
+- **Get translation of a newsletter** Get information about a translation of an individual newsletter
+- **Get translation of a transactional message** Get information about a translation of an individual transactional message
+- **List snippets** List all snippets in the workspace
+- **Update a translation of a broadcast message** Update a translation of a specific broadcast action
+- **Update snippet** Update the name or value of a snippet
+- **Update translation of a newsletter** Update the translation of a newsletter variant
+- **Update translation of a transactional message** Update the body and other data of a specific language variant for a transactional message
 
 ## Feedback
 
