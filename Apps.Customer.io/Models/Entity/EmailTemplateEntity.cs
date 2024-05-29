@@ -1,4 +1,5 @@
 using Apps.Customer.io.Models.Response;
+using Apps.Customer.io.Utils.Converters;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -36,7 +37,7 @@ public class EmailTemplateEntity
     [Display("Reply to")]
     public string ReplyTo { get; set; }
 
-    [Display("Reply to ID")]
+    [Display("Reply to ID"), JsonProperty("reply_to_id")]
     public string ReplyToId { get; set; }
 
     public string Preprocessor { get; set; }
@@ -53,8 +54,9 @@ public class EmailTemplateEntity
 
     [Display("Preheader text")]
     public string PreheaderText { get; set; }
-
-    public List<EmailHeader> Headers { get; set; }
+    
+    [JsonConverter(typeof(EmailHeaderListConverter)), JsonProperty("headers")]
+    public List<EmailHeader> Headers { get; set; } = new();
 
     [Display("Amp body")]
     public string BodyAmp { get; set; }
