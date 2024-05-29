@@ -1,4 +1,5 @@
 using Apps.Customer.io.Models.Response;
+using Apps.Customer.io.Utils.Converters;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -51,7 +52,8 @@ public class BroadcastActionEntity
 
     [Display("Preheader text")] public string PreheaderText { get; set; }
 
-    public List<EmailHeader> Headers { get; set; }
+    [JsonConverter(typeof(EmailHeaderListConverter)), JsonProperty("headers")]
+    public List<EmailHeader> Headers { get; set; } = new();
 
     [Display("Amp body")] public string BodyAmp { get; set; }
 }
