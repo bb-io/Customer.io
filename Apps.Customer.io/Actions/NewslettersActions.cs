@@ -2,6 +2,7 @@ using System.Text;
 using Apps.Customer.io.Api;
 using Apps.Customer.io.Constants;
 using Apps.Customer.io.Invocables;
+using Apps.Customer.io.Models.Entity;
 using Apps.Customer.io.Models.Request.Newsletter;
 using Apps.Customer.io.Models.Response.Newsletter;
 using Blackbird.Applications.Sdk.Common;
@@ -50,9 +51,8 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         
         var html = response.Content.Body;
         await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(html));
-        var contentType = "text/html";
-        var fileReference = await fileManagementClient.UploadAsync(stream, contentType, $"{response.Content?.Name} [{response.Content.Id}].html");
+        var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{response.Content?.Name} [{response.Content?.Id}].html");
         
-        return new NewsletterTranslationFileResponse(response.Content, fileReference);
+        return new NewsletterTranslationFileResponse(response.Content ?? new NewsletterTranslationEntity(), fileReference);
     }
 }
