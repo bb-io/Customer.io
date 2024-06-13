@@ -29,16 +29,9 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
     [Action("Update translation of a newsletter", Description = "Update the translation of a newsletter variant")]
     public async Task<NewsletterTranslationFileResponse> UpdateNewsletterTranslation(
         [ActionParameter] NewsletterRequest input,
-        [ActionParameter] UpdateNewsletterTranslationRequest payload)
+        [ActionParameter] UpdateNewsletterTranslationEntity payload)
     {
-        if (payload.File != null)
-        {
-            var file = await fileManagementClient.DownloadAsync(payload.File);
-            using var reader = new StreamReader(file);
-            payload.Body = await reader.ReadToEndAsync();
-        }
-        
-        return await HandleNewsletterTranslation(input, Method.Put, new(payload));
+        return await HandleNewsletterTranslation(input, Method.Put, payload);
     }
 
     private async Task<NewsletterTranslationFileResponse> HandleNewsletterTranslation(
@@ -51,6 +44,13 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
 
         if (payload != null)
         {
+            if (payload.File != null)
+            {
+                var file = await fileManagementClient.DownloadAsync(payload.File);
+                using var reader = new StreamReader(file);
+                payload.Body = await reader.ReadToEndAsync();
+            }
+            
             request.WithJsonBody(payload, JsonConfig.Settings);
         }
 
