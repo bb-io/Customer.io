@@ -6,12 +6,13 @@
         <Nullable>enable</Nullable>
         <Product>Customer.io</Product>
         <Description>Customer engagement platform</Description>
-        <Version>1.1.2</Version>
+        <Version>1.1.3</Version>
         <AssemblyName>Apps.Customer.io</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Blackbird.Applications.Sdk.Common" Version="2.6.0"/>
+        <PackageReference Include="Blackbird.Applications.Sdk.Common" Version="2.8.0" />
+        <PackageReference Include="Blackbird.Applications.SDK.Extensions.FileManagement" Version="1.0.2-alpha1" />
         <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.12"/>
     </ItemGroup>
 
