@@ -51,7 +51,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var html = response.Content.Body;
         await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(html));
         var contentType = "text/html";
-        var fileReference = await fileManagementClient.UploadAsync(stream, contentType, $"{response.Content.Id}.html");
+        var fileReference = await fileManagementClient.UploadAsync(stream, contentType, $"{response.Content?.Name} [{response.Content.Id}].html");
         
         return new NewsletterTranslationFileResponse(response.Content, fileReference);
     }
