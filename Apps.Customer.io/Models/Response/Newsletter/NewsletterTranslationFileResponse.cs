@@ -1,10 +1,12 @@
 ﻿using Apps.Customer.io.Models.Entity;
+using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Files;
 
 namespace Apps.Customer.io.Models.Response.Newsletter;
 
 public class NewsletterTranslationFileResponse : NewsletterTranslationEntity
 {
+    [Display("HTML document")]
     public FileReference File { get; set; }
     
     public NewsletterTranslationFileResponse(NewsletterTranslationEntity entity, FileReference file)
