@@ -28,7 +28,7 @@ Before you can connect you need to make sure that:
 ## Actions
 
 - **Get translation of a broadcast message** Get information about a translation of message in a broadcast
-- **Get translation of a newsletter** Get information about a translation of an individual newsletter
+- **Get translation of a newsletter** Get information about a translation of an individual newsletter. Also includes file as HTML document in output
 - **Get translation of a transactional message** Get information about a translation of an individual transactional message
 - **List snippets** List all snippets in the workspace
 - **Update a translation of a broadcast message** Update a translation of a specific broadcast action
