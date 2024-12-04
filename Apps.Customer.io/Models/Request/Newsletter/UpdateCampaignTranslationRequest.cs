@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.PortableExecutable;
-using System.Text;
-using System.Threading.Tasks;
-using Apps.Customer.io.DataSourceHandlers.EnumDataHandlers;
+﻿using Apps.Customer.io.DataSourceHandlers.EnumDataHandlers;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Newtonsoft.Json;
 
@@ -26,7 +20,7 @@ namespace Apps.Customer.io.Models.Request.Newsletter
         public int? FromId { get; set; }
 
         [JsonProperty("reply_to_id")]
-        public int? ReplyToId { get; set; } 
+        public int? ReplyToId { get; set; }
 
         [JsonProperty("recipient")]
         public string? Recipient { get; set; }

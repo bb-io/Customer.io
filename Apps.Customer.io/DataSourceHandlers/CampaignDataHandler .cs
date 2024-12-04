@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Apps.Customer.io.Api;
+﻿using Apps.Customer.io.Api;
 using Apps.Customer.io.Invocables;
 using Apps.Customer.io.Models.Response;
 using Blackbird.Applications.Sdk.Common.Dynamic;

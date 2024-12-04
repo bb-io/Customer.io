@@ -5,14 +5,13 @@ using Apps.Customer.io.Invocables;
 using Apps.Customer.io.Models.Entity;
 using Apps.Customer.io.Models.Request.Newsletter;
 using Apps.Customer.io.Models.Response.Newsletter;
+using Apps.Customer.io.Models.Response.TransactionalMessage;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
-using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
+using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using RestSharp;
-using Apps.Customer.io.Models.Response.TransactionalMessage;
-using Apps.Customer.io.Models.Request.Broadcast;
 
 namespace Apps.Customer.io.Actions;
 
