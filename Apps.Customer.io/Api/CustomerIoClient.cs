@@ -1,5 +1,6 @@
 using Apps.Customer.io.Constants;
 using Apps.Customer.io.Models.Response;
+using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using Blackbird.Applications.Sdk.Utils.RestSharp;
 using Newtonsoft.Json;
@@ -11,9 +12,9 @@ public class CustomerIoClient : BlackBirdRestClient
 {
     protected override JsonSerializerSettings? JsonSettings => JsonConfig.Settings;
 
-    public CustomerIoClient() : base(new()
+    public CustomerIoClient(AuthenticationCredentialsProvider[] creds) : base(new()
     {
-        BaseUrl = Urls.Api.ToUri()
+        BaseUrl = creds.First(c => c.KeyName == CredsNames.BaseUrl).Value.ToUri()
     })
     {
     }
