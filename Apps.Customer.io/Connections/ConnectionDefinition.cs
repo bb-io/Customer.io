@@ -15,14 +15,30 @@ public class ConnectionDefinition : IConnectionDefinition
             ConnectionUsage = ConnectionUsage.Actions,
             ConnectionProperties = new List<ConnectionProperty>
             {
-                new(CredsNames.ApiKey) { DisplayName = "API key", Sensitive = true }
+                new(CredsNames.ApiKey)
+                {
+                    DisplayName = "API Key",
+                    Sensitive = true,
+                     Description = "The app API key for authenticating requests to Customer.io."
+                },
+                new(CredsNames.BaseUrl)
+                {
+                    DisplayName = "Base URL",
+                    Description = "Select the base URL for the Customer.io API. Example: https://api.customer.io or https://api-eu.customer.io",
+                    DataItems = [new("https://api.customer.io", "Default API (US)"),
+                                 new("https://api-eu.customer.io", "Europe API (EU)")]
+                }
             }
-        }
+        }       
     };
 
     public IEnumerable<AuthenticationCredentialsProvider> CreateAuthorizationCredentialsProviders(
-        Dictionary<string, string> values) =>
-        values.Select(x =>
-                new AuthenticationCredentialsProvider(AuthenticationCredentialsRequestLocation.None, x.Key, x.Value))
-            .ToList();
+         Dictionary<string, string> values)
+    {
+        var apiKey = values.First(v => v.Key == CredsNames.ApiKey);
+        yield return new AuthenticationCredentialsProvider(apiKey.Key, apiKey.Value);
+
+        var baseUrl = values.First(v => v.Key == CredsNames.BaseUrl);
+        yield return new AuthenticationCredentialsProvider(baseUrl.Key, baseUrl.Value);
+    }
 }

@@ -35,6 +35,8 @@ Before you can connect you need to make sure that:
 - **Update snippet** Update the name or value of a snippet
 - **Update translation of a newsletter** Update the translation of a newsletter variant
 - **Update translation of a transactional message** Update the body and other data of a specific language variant for a transactional message
+- **Get a translation of a campaign message** Getting a translation of a campaign message
+- **Update a translation of a campaign message** Updating a translation of a campaign message
 
 ## Feedback
 

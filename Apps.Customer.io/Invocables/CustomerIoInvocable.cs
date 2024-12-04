@@ -14,6 +14,6 @@ public class CustomerIoInvocable : BaseInvocable
 
     public CustomerIoInvocable(InvocationContext invocationContext) : base(invocationContext)
     {
-        Client = new();
+        Client = new(Creds);
     }
 }

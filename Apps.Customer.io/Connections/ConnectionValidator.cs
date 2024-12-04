@@ -11,7 +11,7 @@ public class ConnectionValidator: IConnectionValidator
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
         CancellationToken cancellationToken)
     {
-        var client = new CustomerIoClient();
+        var client = new CustomerIoClient(authenticationCredentialsProviders.ToArray());
 
         try
         {
