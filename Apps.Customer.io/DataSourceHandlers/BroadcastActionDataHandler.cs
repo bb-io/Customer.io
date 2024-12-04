@@ -30,6 +30,5 @@ public class BroadcastActionDataHandler : CustomerIoInvocable, IAsyncDataSourceI
             .Where(action => string.IsNullOrWhiteSpace(context.SearchString) ||
                              action.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
             .Select(action => new DataSourceItem(action.Id, action.Name));
-
     }
 }
