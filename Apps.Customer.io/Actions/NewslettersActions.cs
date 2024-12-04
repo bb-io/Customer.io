@@ -69,10 +69,9 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
 
     [Action("Get a translation of a campaign message", Description = "Get a translation of a campaign message")]
     public async Task<CampaignMessageTranslationResponse> GetTranslationsForCampaign(
-        [ActionParameter] CampaignTranslationRequest input,
-        [ActionParameter] BroadcastActionRequest inputBroadcast)
+        [ActionParameter] CampaignTranslationRequest input)
     {
-        var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{inputBroadcast.ActionId}/language/{inputBroadcast.Language}";
+        var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
@@ -83,12 +82,12 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
     [Action("Update a translation of a campaign message", Description = "Update a translation of a campaign message")]
     public async Task<CampaignMessageTranslationResponse> UpdateCampaignTranslation(
     [ActionParameter] CampaignTranslationRequest input,
-    [ActionParameter] BroadcastActionRequest inputBroadcast)
+    [ActionParameter] UpdateCampaignTranslationRequest updateRequest)
     {
-        var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{inputBroadcast.ActionId}/language/{inputBroadcast.Language}";
+        var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
 
         var request = new CustomerIoRequest(endpoint, Method.Put, Creds)
-                .WithJsonBody(inputBroadcast, JsonConfig.Settings);
+                .WithJsonBody(updateRequest, JsonConfig.Settings);
 
         var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
 
