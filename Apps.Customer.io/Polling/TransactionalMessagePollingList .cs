@@ -12,6 +12,7 @@ using RestSharp;
 
 namespace Apps.Customer.io.Polling
 {
+    [PollingEventList]
     public class TransactionalMessagePollingList(InvocationContext invocationContext) : BasePollingAction(invocationContext, null)
     {
         [PollingEvent("On transactional message created or updated", "Triggered when a transactional message is created or updated")]

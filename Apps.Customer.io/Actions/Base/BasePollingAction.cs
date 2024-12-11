@@ -17,7 +17,7 @@ namespace Apps.Customer.io.Actions.Base
         protected BasePollingAction(InvocationContext invocationContext, IFileManagementClient fileManagementClient)
         : base(invocationContext)
         {
-            Client = new CustomerIoClient(invocationContext.AuthenticationCredentialsProviders.ToArray());
+            Client = new CustomerIoClient(invocationContext.AuthenticationCredentialsProviders);
         }
     }
 }
