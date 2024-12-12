@@ -7,21 +7,20 @@ using RestSharp;
 
 namespace Apps.Customer.io.DataSourceHandlers;
 
-public class NewsletterDataHandler : CustomerIoInvocable, IAsyncDataSourceHandler
+public class NewsletterDataHandler : CustomerIoInvocable, IAsyncDataSourceItemHandler
 {
     public NewsletterDataHandler(InvocationContext invocationContext) : base(invocationContext)
     {
     }
 
-    public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context,
-        CancellationToken cancellationToken)
+    public async Task<IEnumerable<DataSourceItem>> GetDataAsync(DataSourceContext context, CancellationToken cancellationToken)
     {
         var request = new CustomerIoRequest("v1/newsletters", Method.Get, Creds);
         var response = await Client.ExecuteWithErrorHandling<ListNewslettersResponse>(request);
 
         return response.Newsletters
-            .Where(x => context.SearchString is null ||
-                        x.DisplayName.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(x => x.Id, x => x.DisplayName);
+           .Where(newsletter => string.IsNullOrWhiteSpace(context.SearchString) ||
+                                newsletter.DisplayName.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
+           .Select(newsletter => new DataSourceItem(newsletter.Id, newsletter.DisplayName));
     }
 }

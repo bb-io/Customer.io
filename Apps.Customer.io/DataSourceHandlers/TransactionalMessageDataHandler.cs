@@ -7,21 +7,20 @@ using RestSharp;
 
 namespace Apps.Customer.io.DataSourceHandlers;
 
-public class TransactionalMessageDataHandler : CustomerIoInvocable, IAsyncDataSourceHandler
+public class TransactionalMessageDataHandler : CustomerIoInvocable, IAsyncDataSourceItemHandler
 {
     public TransactionalMessageDataHandler(InvocationContext invocationContext) : base(invocationContext)
     {
     }
 
-    public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context,
-        CancellationToken cancellationToken)
+    public async Task<IEnumerable<DataSourceItem>> GetDataAsync(DataSourceContext context, CancellationToken cancellationToken)
     {
         var request = new CustomerIoRequest("v1/transactional", Method.Get, Creds);
         var response = await Client.ExecuteWithErrorHandling<ListMessagesResponse>(request);
 
         return response.Messages
-            .Where(x => context.SearchString is null ||
-                        x.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(x => x.Id, x => x.Name);
+           .Where(message => string.IsNullOrWhiteSpace(context.SearchString) ||
+                             message.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
+           .Select(message => new DataSourceItem(message.Id, message.Name));
     }
 }

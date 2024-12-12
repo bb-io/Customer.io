@@ -9,7 +9,7 @@ using RestSharp;
 
 namespace Apps.Customer.io.DataSourceHandlers;
 
-public class BroadcastActionDataHandler : CustomerIoInvocable, IAsyncDataSourceHandler
+public class BroadcastActionDataHandler : CustomerIoInvocable, IAsyncDataSourceItemHandler
 {
     private string BroadcastId { get; }
 
@@ -18,10 +18,7 @@ public class BroadcastActionDataHandler : CustomerIoInvocable, IAsyncDataSourceH
     {
         BroadcastId = request.BroadcastId;
     }
-
-
-    public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context,
-        CancellationToken cancellationToken)
+    public async Task<IEnumerable<DataSourceItem>> GetDataAsync(DataSourceContext context, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(BroadcastId))
             throw new("You have to input Broadcast first");
@@ -30,8 +27,8 @@ public class BroadcastActionDataHandler : CustomerIoInvocable, IAsyncDataSourceH
         var response = await Client.ExecuteWithErrorHandling<ListBroadcastActionsResponse>(request);
 
         return response.Actions
-            .Where(x => context.SearchString is null ||
-                        x.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(x => x.Id, x => x.Name);
+            .Where(action => string.IsNullOrWhiteSpace(context.SearchString) ||
+                             action.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
+            .Select(action => new DataSourceItem(action.Id, action.Name));
     }
 }

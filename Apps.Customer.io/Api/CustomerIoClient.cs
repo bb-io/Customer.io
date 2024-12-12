@@ -12,7 +12,7 @@ public class CustomerIoClient : BlackBirdRestClient
 {
     protected override JsonSerializerSettings? JsonSettings => JsonConfig.Settings;
 
-    public CustomerIoClient(AuthenticationCredentialsProvider[] creds) : base(new()
+    public CustomerIoClient(IEnumerable<AuthenticationCredentialsProvider> creds) : base(new()
     {
         BaseUrl = creds.First(c => c.KeyName == CredsNames.BaseUrl).Value.ToUri()
     })
