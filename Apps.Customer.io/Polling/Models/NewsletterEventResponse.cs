@@ -35,10 +35,13 @@ namespace Apps.Customer.io.Polling.Models
         public string Name { get; set; }
 
         [JsonProperty("tags")]
-        public List<string> Tags { get; set; }
+        public List<string> Tags { get; set; } = new();
 
         [JsonProperty("subscription_topic_id")]
-        public int SubscriptionTopicId { get; set; }
+        public int? SubscriptionTopicId { get; set; }
+
+        [JsonProperty("content_ids")]
+        public List<int> ContentIds { get; set; } = new();
     }
 
 }
