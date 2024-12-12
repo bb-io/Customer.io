@@ -12,7 +12,7 @@ namespace Apps.Customer.io.Polling
     public class BroadcastPollingList(InvocationContext invocationContext): BasePollingAction(invocationContext, null)
     {
 
-        [PollingEvent("On broadcast created or updated", "Triggered when a new broadcast was created")]
+        [PollingEvent("On broadcast created or updated", "Triggered when a new broadcast was created or updated")]
         public async Task<PollingEventResponse<BroadcastMemory, BroadcastEventResponse>> OnBroadcastCreatedOrUpdated(
             PollingEventRequest<BroadcastMemory> request)
         {

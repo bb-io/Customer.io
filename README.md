@@ -38,6 +38,14 @@ Before you can connect you need to make sure that:
 - **Get a translation of a campaign message** Getting a translation of a campaign message
 - **Update a translation of a campaign message** Updating a translation of a campaign message
 
+## Polling 
+
+- **Broadcast polling** Triggered when a new broadcast was created or updated
+- **Newsletters polling** Triggered when a newsletter is created or updated
+- **Campaign message polling** Triggered when a campaign message is created or updated
+- **Transactional message polling** Triggered when a transactional message is created or updated
+
+
 ## Feedback
 
 Do you want to use this app or do you have feedback on our implementation? Reach out to us using the [established channels](https://www.blackbird.io/) or create an issue.
