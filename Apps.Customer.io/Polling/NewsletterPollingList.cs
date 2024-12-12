@@ -82,7 +82,11 @@ namespace Apps.Customer.io.Polling
             return new PollingEventResponse<NewsletterMemory, NewsletterEventResponse>
             {
                 FlyBird = false,
-                Memory = request.Memory
+                Memory = new NewsletterMemory
+                {
+                    LastPollingTime = DateTime.UtcNow,
+                    Triggered = false
+                }
             };
         }
     }

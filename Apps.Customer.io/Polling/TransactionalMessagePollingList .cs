@@ -37,7 +37,11 @@ namespace Apps.Customer.io.Polling
                 return new PollingEventResponse<TransactionalMemory, TransactionalMessageResponse>
                 {
                     FlyBird = false,
-                    Memory = request.Memory
+                    Memory = new TransactionalMemory
+                    {
+                        LastPollingTime=DateTime.UtcNow,
+                        Triggered=false
+                    }
                 };
             }
 
@@ -72,7 +76,11 @@ namespace Apps.Customer.io.Polling
             return new PollingEventResponse<TransactionalMemory, TransactionalMessageResponse>
             {
                 FlyBird = false,
-                Memory = request.Memory
+                Memory = new TransactionalMemory
+                {
+                    LastPollingTime = DateTime.UtcNow,
+                    Triggered = false
+                }
             };
         }
     }
