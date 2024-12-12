@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <Product>Customer.io</Product>
         <Description>Customer engagement platform</Description>
-        <Version>1.1.7</Version>
+        <Version>1.1.8</Version>
         <AssemblyName>Apps.Customer.io</AssemblyName>
     </PropertyGroup>
 
