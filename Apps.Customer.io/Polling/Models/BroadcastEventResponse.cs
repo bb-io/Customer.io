@@ -38,7 +38,7 @@ namespace Apps.Customer.io.Polling.Models
         public string State { get; set; }
 
         [JsonProperty("actions")]
-        public List<string> Actions { get; set; }
+        public List<Actions> Actions { get; set; }
 
         [JsonProperty("tags")]
         public List<string> Tags { get; set; }
@@ -48,5 +48,13 @@ namespace Apps.Customer.io.Polling.Models
 
         [JsonProperty("created_by")]
         public string CreatedBy { get; set; }
+    }
+    public class Actions
+    {
+        [JsonProperty("id")]
+        public int Id { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
     }
 }
