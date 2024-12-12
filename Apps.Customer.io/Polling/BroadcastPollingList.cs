@@ -37,7 +37,11 @@ namespace Apps.Customer.io.Polling
                 return new PollingEventResponse<BroadcastMemory, BroadcastEventResponse>
                 {
                     FlyBird = false,
-                    Memory = request.Memory
+                    Memory = new BroadcastMemory
+                    {
+                        LastPollingTime = DateTime.UtcNow,
+                        Triggered = false
+                    }
                 };
             }
 
@@ -77,7 +81,11 @@ namespace Apps.Customer.io.Polling
             return new PollingEventResponse<BroadcastMemory, BroadcastEventResponse>
             {
                 FlyBird = false,
-                Memory = request.Memory
+                Memory = new BroadcastMemory
+                {
+                    LastPollingTime = DateTime.UtcNow,
+                    Triggered = false
+                }
             };
         }
     }
