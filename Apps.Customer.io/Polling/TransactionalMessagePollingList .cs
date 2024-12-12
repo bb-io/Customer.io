@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Apps.Customer.io.Actions.Base;
+﻿using Apps.Customer.io.Actions.Base;
 using Apps.Customer.io.Api;
 using Apps.Customer.io.Polling.Models;
 using Blackbird.Applications.Sdk.Common.Invocation;

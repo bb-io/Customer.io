@@ -29,7 +29,7 @@ namespace Apps.Customer.io.Polling
                 };
             }
 
-            var requestClient = new CustomerIoRequest("v1/broadcasts", Method.Get,invocationContext.AuthenticationCredentialsProviders);
+            var requestClient = new CustomerIoRequest("v1/broadcasts", Method.Get,Creds);
             var response = await Client.ExecuteWithErrorHandling<BroadcastEventResponse>(requestClient);
 
             if (response == null || response.Broadcasts == null || !response.Broadcasts.Any())
