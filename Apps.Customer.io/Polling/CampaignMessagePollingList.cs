@@ -41,7 +41,7 @@ namespace Apps.Customer.io.Polling
                     throw new InvalidOperationException("Campaign ID must be provided.");
                 }
 
-                var requestClient = new CustomerIoRequest($"v1/api/campaigns/{campaignId}/actions", Method.Get, InvocationContext.AuthenticationCredentialsProviders);
+                var requestClient = new CustomerIoRequest($"v1/api/campaigns/{campaignId}/actions", Method.Get, Creds);
                 var response = await Client.ExecuteWithErrorHandling<CampaignMessageResponse>(requestClient);
 
                 if (response == null || response.Actions == null || !response.Actions.Any())
