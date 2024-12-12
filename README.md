@@ -40,10 +40,10 @@ Before you can connect you need to make sure that:
 
 ## Polling 
 
-- **Broadcast polling** Triggered when a new broadcast was created or updated
-- **Newsletters polling** Triggered when a newsletter is created or updated
-- **Campaign message polling** Triggered when a campaign message is created or updated
-- **Transactional message polling** Triggered when a transactional message is created or updated
+- **On broadcast created or updated** Triggered when a new broadcast was created or updated
+- **On newsletter created or updated** Triggered when a newsletter is created or updated
+- **On campaign message created or updated** Triggered when a campaign message is created or updated
+- **On transactional message created or updated** Triggered when a transactional message is created or updated
 
 
 ## Feedback

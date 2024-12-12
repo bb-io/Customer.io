@@ -49,7 +49,11 @@ namespace Apps.Customer.io.Polling
                     return new PollingEventResponse<CampaignMemory, CampaignMessageResponse>
                     {
                         FlyBird = false,
-                        Memory = request.Memory
+                        Memory = new CampaignMemory
+                        {
+                            LastPollingTime = DateTime.UtcNow,
+                            Triggered=false
+                        }
                     };
                 }
 
@@ -84,7 +88,11 @@ namespace Apps.Customer.io.Polling
                 return new PollingEventResponse<CampaignMemory, CampaignMessageResponse>
                 {
                     FlyBird = false,
-                    Memory = request.Memory
+                    Memory = new CampaignMemory
+                    {
+                        LastPollingTime = DateTime.UtcNow,
+                        Triggered = false
+                    }
                 };
             }
         }
