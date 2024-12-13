@@ -1,4 +1,3 @@
-using System.Text;
 using Apps.Customer.io.Api;
 using Apps.Customer.io.Constants;
 using Apps.Customer.io.Invocables;
@@ -12,6 +11,7 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using RestSharp;
+using System.Text;
 
 namespace Apps.Customer.io.Actions;
 
@@ -57,7 +57,25 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
 
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
 
-        var html = response.Content.Body;
+        var subject = response.Content?.Subject ?? "";
+        var preheader = response.Content?.PreheaderText ?? "";
+        var body = response.Content?.Body ?? "";
+
+        var html = $@"<!DOCTYPE html>
+            <html lang='en'>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <meta name='subject' content='{subject}'>
+                <meta name='preheader' content='{preheader}'>
+                <title>{subject}</title>
+            </head>
+            <body>
+                {body}
+            </body>
+        </html>";
+
+
         await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(html));
         var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{response.Content?.Name} [{response.Content?.Id}].html");
 
