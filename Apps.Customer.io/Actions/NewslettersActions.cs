@@ -10,6 +10,7 @@ using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using HtmlAgilityPack;
 using RestSharp;
 using System.Text;
 
@@ -50,6 +51,26 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
                 var file = await fileManagementClient.DownloadAsync(payload.File);
                 using var reader = new StreamReader(file);
                 payload.Body = await reader.ReadToEndAsync();
+
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(payload.Body);
+
+                var subjectMeta = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='subject']");
+                var preheaderMeta = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='preheader']");
+
+                if (subjectMeta != null)
+                {
+                    payload.Subject = subjectMeta.GetAttributeValue("content", string.Empty);
+                    subjectMeta.Remove();
+                }
+
+                if (preheaderMeta != null)
+                {
+                    payload.PreheaderText = preheaderMeta.GetAttributeValue("content", string.Empty);
+                    preheaderMeta.Remove();
+                }
+
+                payload.Body = htmlDoc.DocumentNode.OuterHtml;
             }
 
             request.WithJsonBody(payload, JsonConfig.Settings);
