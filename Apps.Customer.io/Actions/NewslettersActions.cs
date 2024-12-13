@@ -71,16 +71,17 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
                 }
 
                 payload.Body = htmlDoc.DocumentNode.OuterHtml;
-            }
-
+            }     
             request.WithJsonBody(payload, JsonConfig.Settings);
         }
 
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
 
-        var subject = response.Content?.Subject ?? "";
-        var preheader = response.Content?.PreheaderText ?? "";
-        var body = response.Content?.Body ?? "";
+        var entity = response.Content;
+
+        var subject = entity.Subject ?? "";
+        var preheader = entity.PreheaderText ?? "";
+        var body = entity.Body ?? "";
 
         var html = $@"<!DOCTYPE html>
             <html lang='en'>
@@ -95,7 +96,6 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
                 {body}
             </body>
         </html>";
-
 
         await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(html));
         var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{response.Content?.Name} [{response.Content?.Id}].html");
