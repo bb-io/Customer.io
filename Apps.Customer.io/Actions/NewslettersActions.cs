@@ -72,8 +72,6 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
 
                 payload.Body = htmlDoc.DocumentNode.OuterHtml;
             }
-
-            request.WithJsonBody(payload, JsonConfig.Settings);
         }
 
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
@@ -102,8 +100,6 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
 
         return new NewsletterTranslationFileResponse(response.Content ?? new NewsletterTranslationEntity(), fileReference);
     }
-
-
 
     [Action("Get a translation of a campaign message", Description = "Get a translation of a campaign message")]
     public async Task<CampaignMessageTranslationResponse> GetTranslationsForCampaign(
