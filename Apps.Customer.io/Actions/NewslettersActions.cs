@@ -1,4 +1,3 @@
-using System.Text;
 using Apps.Customer.io.Api;
 using Apps.Customer.io.Constants;
 using Apps.Customer.io.Invocables;
@@ -11,7 +10,10 @@ using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using HtmlAgilityPack;
+using Newtonsoft.Json;
 using RestSharp;
+using System.Text;
 
 namespace Apps.Customer.io.Actions;
 
@@ -50,18 +52,75 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
                 var file = await fileManagementClient.DownloadAsync(payload.File);
                 using var reader = new StreamReader(file);
                 payload.Body = await reader.ReadToEndAsync();
-            }
 
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(payload.Body);
+
+                var subjectDiv = htmlDoc.DocumentNode.SelectSingleNode("//div[@id='subject']");
+                var preheaderDiv = htmlDoc.DocumentNode.SelectSingleNode("//div[@id='preheader']");
+
+                if (subjectDiv != null)
+                    payload.Subject = subjectDiv.InnerText.Trim();
+
+                if (preheaderDiv != null)
+                    payload.PreheaderText = preheaderDiv.InnerText.Trim();
+
+                if (method == Method.Put)
+                {
+                    subjectDiv?.Remove();
+                    preheaderDiv?.Remove();
+                }
+
+                payload.Body = htmlDoc.DocumentNode.OuterHtml;
+            }
             request.WithJsonBody(payload, JsonConfig.Settings);
         }
-
+        
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
+        var entity = response.Content;
+        var subject = entity.Subject ?? "";
+        var preheader = entity.PreheaderText ?? "";
+        var body = entity.Body ?? "";
 
-        var html = response.Content.Body;
+
+        var doc = new HtmlDocument();
+        doc.LoadHtml(body);
+
+        var innerBody = doc.DocumentNode.SelectSingleNode("//body");
+        string finalBodyContent;
+
+        if (innerBody != null)
+        {
+            finalBodyContent = innerBody.InnerHtml;
+        }
+        else
+        {
+            finalBodyContent = body;
+        }
+
+        if (method == Method.Get)
+        {
+            finalBodyContent = $@"<div id='subject'>{subject}</div>
+                                  <div id='preheader'>{preheader}</div>
+                                  {finalBodyContent}";
+        }
+
+        var html = $@"<!DOCTYPE html>
+                    <html lang='en'>
+                    <head>
+                        <meta charset='UTF-8'>
+                        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                        <title>{subject}</title>
+                    </head>
+                    <body>
+                        {finalBodyContent}
+                    </body>
+                    </html>";
+
         await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(html));
-        var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{response.Content?.Name} [{response.Content?.Id}].html");
+        var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{entity?.Name} [{entity?.Id}].html");
 
-        return new NewsletterTranslationFileResponse(response.Content ?? new NewsletterTranslationEntity(), fileReference);
+        return new NewsletterTranslationFileResponse(entity ?? new NewsletterTranslationEntity(), fileReference);
     }
 
 
