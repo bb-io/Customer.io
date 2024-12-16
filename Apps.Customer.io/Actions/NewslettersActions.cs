@@ -56,29 +56,38 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
                 var htmlDoc = new HtmlDocument();
                 htmlDoc.LoadHtml(payload.Body);
 
-                var subjectMeta = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='subject']");
-                var preheaderMeta = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='preheader']");
+                var subjectDiv = htmlDoc.DocumentNode.SelectSingleNode("//div[@id='subject']");
+                var preheaderDiv = htmlDoc.DocumentNode.SelectSingleNode("//div[@id='preheader']");
 
-                if (subjectMeta != null)
-                {
-                    payload.Subject = subjectMeta.GetAttributeValue("content", string.Empty);
-                    subjectMeta.Remove();
-                }
+                if (subjectDiv != null)
+                    payload.Subject = subjectDiv.InnerText.Trim();
 
-                if (preheaderMeta != null)
+                if (preheaderDiv != null)
+                    payload.PreheaderText = preheaderDiv.InnerText.Trim();
+
+                if (method == Method.Put)
                 {
-                    payload.PreheaderText = preheaderMeta.GetAttributeValue("content", string.Empty);
-                    preheaderMeta.Remove();
+                    subjectDiv?.Remove();
+                    preheaderDiv?.Remove();
                 }
 
                 payload.Body = htmlDoc.DocumentNode.OuterHtml;
             }
+
+            var requestJson = JsonConvert.SerializeObject(payload, Formatting.Indented);
+            Console.WriteLine("=== Request JSON ===");
+            Console.WriteLine(requestJson);
+            Console.WriteLine("====================");
 
             request.WithJsonBody(payload, JsonConfig.Settings);
         }
         
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
 
+        var responseJson = JsonConvert.SerializeObject(response.Content, Formatting.Indented);
+        Console.WriteLine("=== Response JSON ===");
+        Console.WriteLine(responseJson);
+        Console.WriteLine("=====================");
 
         var entity = response.Content;
 
@@ -86,24 +95,32 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var preheader = entity.PreheaderText ?? "";
         var body = entity.Body ?? "";
 
+        string finalBody = body;
+
+        if (method == Method.Get)
+        {
+            finalBody = $@"<div id='subject'>{subject}</div>
+                       <div id='preheader'>{preheader}</div>
+                       {body}";
+        }
+
+
         var html = $@"<!DOCTYPE html>
-            <html lang='en'>
-            <head>
-                <meta charset='UTF-8'>
-                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                <meta name='subject' content='{subject}'>
-                <meta name='preheader' content='{preheader}'>
-                <title>{subject}</title>
-            </head>
-            <body>
-                {body}
-            </body>
-        </html>";
+                    <html lang='en'>
+                    <head>
+                        <meta charset='UTF-8'>
+                        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                        <title>{subject}</title>
+                    </head>
+                    <body>
+                        {finalBody}
+                    </body>
+                    </html>";
 
         await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(html));
-        var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{response.Content?.Name} [{response.Content?.Id}].html");
+        var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{entity?.Name} [{entity?.Id}].html");
 
-        return new NewsletterTranslationFileResponse(response.Content ?? new NewsletterTranslationEntity(), fileReference);
+        return new NewsletterTranslationFileResponse(entity ?? new NewsletterTranslationEntity(), fileReference);
     }
 
 
