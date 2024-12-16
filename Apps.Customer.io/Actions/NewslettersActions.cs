@@ -90,20 +90,32 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         Console.WriteLine("=====================");
 
         var entity = response.Content;
-
         var subject = entity.Subject ?? "";
         var preheader = entity.PreheaderText ?? "";
         var body = entity.Body ?? "";
 
-        string finalBody = body;
+
+        var doc = new HtmlDocument();
+        doc.LoadHtml(body);
+
+        var innerBody = doc.DocumentNode.SelectSingleNode("//body");
+        string finalBodyContent;
+
+        if (innerBody != null)
+        {
+            finalBodyContent = innerBody.InnerHtml;
+        }
+        else
+        {
+            finalBodyContent = body;
+        }
 
         if (method == Method.Get)
         {
-            finalBody = $@"<div id='subject'>{subject}</div>
-                       <div id='preheader'>{preheader}</div>
-                       {body}";
+            finalBodyContent = $@"<div id='subject'>{subject}</div>
+                                  <div id='preheader'>{preheader}</div>
+                                  {finalBodyContent}";
         }
-
 
         var html = $@"<!DOCTYPE html>
                     <html lang='en'>
@@ -113,9 +125,10 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
                         <title>{subject}</title>
                     </head>
                     <body>
-                        {finalBody}
+                        {finalBodyContent}
                     </body>
                     </html>";
+
 
         await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(html));
         var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{entity?.Name} [{entity?.Id}].html");
