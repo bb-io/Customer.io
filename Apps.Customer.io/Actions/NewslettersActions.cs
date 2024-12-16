@@ -11,6 +11,7 @@ using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace Apps.Customer.io.Actions;
@@ -51,10 +52,9 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
                 using var reader = new StreamReader(file);
                 payload.Body = await reader.ReadToEndAsync();
             }
-
             request.WithJsonBody(payload, JsonConfig.Settings);
         }
-
+        
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
 
         var html = response.Content.Body;
@@ -62,6 +62,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{response.Content?.Name} [{response.Content?.Id}].html");
 
         return new NewsletterTranslationFileResponse(response.Content ?? new NewsletterTranslationEntity(), fileReference);
+
     }
 
 
