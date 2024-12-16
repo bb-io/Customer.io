@@ -73,22 +73,10 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
 
                 payload.Body = htmlDoc.DocumentNode.OuterHtml;
             }
-
-            var requestJson = JsonConvert.SerializeObject(payload, Formatting.Indented);
-            Console.WriteLine("=== Request JSON ===");
-            Console.WriteLine(requestJson);
-            Console.WriteLine("====================");
-
             request.WithJsonBody(payload, JsonConfig.Settings);
         }
         
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
-
-        var responseJson = JsonConvert.SerializeObject(response.Content, Formatting.Indented);
-        Console.WriteLine("=== Response JSON ===");
-        Console.WriteLine(responseJson);
-        Console.WriteLine("=====================");
-
         var entity = response.Content;
         var subject = entity.Subject ?? "";
         var preheader = entity.PreheaderText ?? "";
@@ -128,7 +116,6 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
                         {finalBodyContent}
                     </body>
                     </html>";
-
 
         await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(html));
         var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{entity?.Name} [{entity?.Id}].html");
