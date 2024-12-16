@@ -11,9 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{3078AB9E-9BD2-4CB9-B69B-1DD67924E446}"
-	ProjectSection(ProjectDependencies) = postProject
-		{EB25604E-8EBA-464E-BEDF-30EA95395AD3} = {EB25604E-8EBA-464E-BEDF-30EA95395AD3}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

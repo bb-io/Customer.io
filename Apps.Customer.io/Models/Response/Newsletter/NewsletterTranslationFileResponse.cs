@@ -26,5 +26,7 @@ public class NewsletterTranslationFileResponse : NewsletterTranslationEntity
         this.ReplyTo = entity.ReplyTo;
         this.ReplyToId = entity.ReplyToId;
         this.Preprocessor = entity.Preprocessor;
+        this.PreheaderText = entity.PreheaderText;
+        this.Subject = entity.Subject;
     }
 }

@@ -11,6 +11,7 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
 using RestSharp;
 using System.Text;
 
@@ -71,11 +72,13 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
                 }
 
                 payload.Body = htmlDoc.DocumentNode.OuterHtml;
-            }     
+            }
+
             request.WithJsonBody(payload, JsonConfig.Settings);
         }
-
+        
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
+
 
         var entity = response.Content;
 
