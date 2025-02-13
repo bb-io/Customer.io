@@ -12,21 +12,21 @@ public class NewsletterTranslationFileResponse : NewsletterTranslationEntity
     public NewsletterTranslationFileResponse(NewsletterTranslationEntity entity, FileReference file)
     {
         File = file;
-        this.Id = entity.Id;
-        this.NewsletterId = entity.NewsletterId;
-        this.DeduplicateId = entity.DeduplicateId;
-        this.Name = entity.Name;
-        this.Layout = entity.Layout;
-        this.Body = entity.Body;
-        this.BodyAmp = entity.BodyAmp;
-        this.Language = entity.Language;
-        this.Type = entity.Type;
-        this.From = entity.From;
-        this.FromId = entity.FromId;
-        this.ReplyTo = entity.ReplyTo;
-        this.ReplyToId = entity.ReplyToId;
-        this.Preprocessor = entity.Preprocessor;
-        this.PreheaderText = entity.PreheaderText;
-        this.Subject = entity.Subject;
+        Id = entity.Id;
+        NewsletterId = entity.NewsletterId;
+        DeduplicateId = entity.DeduplicateId;
+        Name = entity.Name;
+        Layout = entity.Layout;
+        Body = entity.Body;
+        BodyAmp = entity.BodyAmp;
+        Language = entity.Language;
+        Type = entity.Type;
+        From = entity.From;
+        FromId = entity.FromId;
+        ReplyTo = entity.ReplyTo;
+        ReplyToId = entity.ReplyToId;
+        Preprocessor = entity.Preprocessor;
+        PreheaderText = entity.PreheaderText;
+        Subject = entity.Subject;
     }
 }

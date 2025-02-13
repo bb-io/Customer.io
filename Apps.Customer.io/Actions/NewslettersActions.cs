@@ -23,8 +23,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
 {
     [Action("Get translation of a newsletter",
         Description = "Get information about a translation of an individual newsletter")]
-    public async Task<NewsletterTranslationFileResponse> GetNewsletterTranslation(
-        [ActionParameter] NewsletterRequest input)
+    public async Task<NewsletterTranslationFileResponse> GetNewsletterTranslation([ActionParameter] NewsletterRequest input)
     {
         return await HandleNewsletterTranslation(input, Method.Get);
     }

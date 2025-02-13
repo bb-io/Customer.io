@@ -13,13 +13,9 @@ using RestSharp;
 namespace Apps.Customer.io.Actions;
 
 [ActionList]
-public class SnippetsActions : CustomerIoInvocable
+public class SnippetsActions(InvocationContext invocationContext) : CustomerIoInvocable(invocationContext)
 {
-    public SnippetsActions(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
-    [Action("List snippets", Description = "List all snippets in the workspace")]
+    [Action("Search snippets", Description = "Returns all snippets in the workspace")]
     public Task<ListSnippetsResponse> ListSnippets()
     {
         var request = new CustomerIoRequest("v1/snippets", Method.Get, Creds);

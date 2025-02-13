@@ -1,5 +1,5 @@
 ﻿using Apps.Customer.io.DataSourceHandlers.EnumDataHandlers;
-using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 using Newtonsoft.Json;
 
 namespace Apps.Customer.io.Models.Request.Newsletter
@@ -13,7 +13,7 @@ namespace Apps.Customer.io.Models.Request.Newsletter
         public string BodyAmp { get; set; }
 
         [JsonProperty("sending_state")]
-        [DataSource(typeof(SendingStateDataHandler))]
+        [StaticDataSource(typeof(SendingStateDataHandler))]
         public string? SendingState { get; set; }
 
         [JsonProperty("from_id")]

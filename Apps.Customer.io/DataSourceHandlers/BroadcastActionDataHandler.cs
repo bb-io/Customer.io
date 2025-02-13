@@ -9,15 +9,13 @@ using RestSharp;
 
 namespace Apps.Customer.io.DataSourceHandlers;
 
-public class BroadcastActionDataHandler : CustomerIoInvocable, IAsyncDataSourceItemHandler
+public class BroadcastActionDataHandler(
+    InvocationContext invocationContext,
+    [ActionParameter] BroadcastActionRequest request)
+    : CustomerIoInvocable(invocationContext), IAsyncDataSourceItemHandler
 {
-    private string BroadcastId { get; }
+    private string BroadcastId { get; } = request.BroadcastId;
 
-    public BroadcastActionDataHandler(InvocationContext invocationContext,
-        [ActionParameter] BroadcastActionRequest request) : base(invocationContext)
-    {
-        BroadcastId = request.BroadcastId;
-    }
     public async Task<IEnumerable<DataSourceItem>> GetDataAsync(DataSourceContext context, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(BroadcastId))

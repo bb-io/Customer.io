@@ -1,6 +1,5 @@
-﻿using Apps.Customer.io.Actions.Base;
-using Apps.Customer.io.Api;
-using Apps.Customer.io.Models.Response.Broadcast;
+﻿using Apps.Customer.io.Api;
+using Apps.Customer.io.Invocables;
 using Apps.Customer.io.Polling.Models;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Polling;
@@ -9,10 +8,9 @@ using RestSharp;
 namespace Apps.Customer.io.Polling
 {
     [PollingEventList]
-    public class BroadcastPollingList(InvocationContext invocationContext): BasePollingAction(invocationContext, null)
+    public class BroadcastPollingList(InvocationContext invocationContext) : CustomerIoInvocable(invocationContext)
     {
-
-        [PollingEvent("On broadcast created or updated", "Triggered when a new broadcast was created or updated")]
+        [PollingEvent("On broadcasts created or updated", "Triggered when a new broadcasts was created or updated")]
         public async Task<PollingEventResponse<BroadcastMemory, BroadcastEventResponse>> OnBroadcastCreatedOrUpdated(
             PollingEventRequest<BroadcastMemory> request)
         {
@@ -29,7 +27,7 @@ namespace Apps.Customer.io.Polling
                 };
             }
 
-            var requestClient = new CustomerIoRequest("v1/broadcasts", Method.Get,Creds);
+            var requestClient = new CustomerIoRequest("v1/broadcasts", Method.Get, Creds);
             var response = await Client.ExecuteWithErrorHandling<BroadcastEventResponse>(requestClient);
 
             if (response == null || response.Broadcasts == null || !response.Broadcasts.Any())

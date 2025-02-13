@@ -7,12 +7,9 @@ using RestSharp;
 
 namespace Apps.Customer.io.DataSourceHandlers;
 
-public class TransactionalMessageDataHandler : CustomerIoInvocable, IAsyncDataSourceItemHandler
+public class TransactionalMessageDataHandler(InvocationContext invocationContext)
+    : CustomerIoInvocable(invocationContext), IAsyncDataSourceItemHandler
 {
-    public TransactionalMessageDataHandler(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     public async Task<IEnumerable<DataSourceItem>> GetDataAsync(DataSourceContext context, CancellationToken cancellationToken)
     {
         var request = new CustomerIoRequest("v1/transactional", Method.Get, Creds);

@@ -6,9 +6,9 @@ namespace Apps.Customer.io.Models.Request.TransactionalMessage;
 
 public class TransactionalMessageTranslationRequest
 {
-    [Display("Transactional message")]
+    [Display("Transactional message ID")]
     [DataSource(typeof(TransactionalMessageDataHandler))]
-    public string TransactionalMessageId { get; set; }
+    public string TransactionalMessageId { get; set; } = string.Empty;
 
     public string? Language { get; set; }
 }

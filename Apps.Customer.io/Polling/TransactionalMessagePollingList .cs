@@ -1,5 +1,5 @@
-﻿using Apps.Customer.io.Actions.Base;
-using Apps.Customer.io.Api;
+﻿using Apps.Customer.io.Api;
+using Apps.Customer.io.Invocables;
 using Apps.Customer.io.Polling.Models;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Polling;
@@ -8,11 +8,13 @@ using RestSharp;
 namespace Apps.Customer.io.Polling
 {
     [PollingEventList]
-    public class TransactionalMessagePollingList(InvocationContext invocationContext) : BasePollingAction(invocationContext, null)
+    public class TransactionalMessagePollingList(InvocationContext invocationContext)
+        : CustomerIoInvocable(invocationContext)
     {
-        [PollingEvent("On transactional message created or updated", "Triggered when a transactional message is created or updated")]
+        [PollingEvent("On transactional messages created or updated",
+            "Triggered when a transactional messages is created or updated")]
         public async Task<PollingEventResponse<TransactionalMemory, TransactionalMessageResponse>> OnTransactionalMessageCreatedOrUpdated(
-            PollingEventRequest<TransactionalMemory> request)
+                PollingEventRequest<TransactionalMemory> request)
         {
             if (request.Memory is null)
             {
@@ -29,7 +31,8 @@ namespace Apps.Customer.io.Polling
 
             var lastPollingTime = request.Memory.LastPollingTime ?? DateTime.MinValue;
 
-            var requestClient = new CustomerIoRequest("v1/transactional", Method.Get, InvocationContext.AuthenticationCredentialsProviders);
+            var requestClient = new CustomerIoRequest("v1/transactional", Method.Get,
+                InvocationContext.AuthenticationCredentialsProviders);
             var response = await Client.ExecuteWithErrorHandling<TransactionalMessageResponse>(requestClient);
 
             if (response == null || response.Messages == null || !response.Messages.Any())
@@ -39,8 +42,8 @@ namespace Apps.Customer.io.Polling
                     FlyBird = false,
                     Memory = new TransactionalMemory
                     {
-                        LastPollingTime=DateTime.UtcNow,
-                        Triggered=false
+                        LastPollingTime = DateTime.UtcNow,
+                        Triggered = false
                     }
                 };
             }
@@ -50,7 +53,8 @@ namespace Apps.Customer.io.Polling
                 .ToList();
 
             var updatedMessages = response.Messages
-                .Where(m => DateTimeOffset.FromUnixTimeSeconds(m.UpdatedAt) > lastPollingTime && m.CreatedAt != m.UpdatedAt)
+                .Where(m => DateTimeOffset.FromUnixTimeSeconds(m.UpdatedAt) > lastPollingTime &&
+                            m.CreatedAt != m.UpdatedAt)
                 .ToList();
 
             if (newMessages.Any() || updatedMessages.Any())

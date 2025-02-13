@@ -13,15 +13,10 @@ using RestSharp;
 namespace Apps.Customer.io.Actions;
 
 [ActionList]
-public class TransactionalMessagesActions : CustomerIoInvocable
+public class TransactionalMessagesActions(InvocationContext invocationContext) : CustomerIoInvocable(invocationContext)
 {
-    public TransactionalMessagesActions(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     [Action("Get translation of a transactional message", Description = "Get information about a translation of an individual transactional message")]
-    public async Task<EmailTemplateEntity> GetTransactionalMessageTranslation(
-        [ActionParameter] TransactionalMessageTranslationRequest input)
+    public async Task<EmailTemplateEntity> GetTransactionalMessageTranslation([ActionParameter] TransactionalMessageTranslationRequest input)
     {
         var endpoint = $"v1/transactional/{input.TransactionalMessageId}/language/{input.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
@@ -31,8 +26,7 @@ public class TransactionalMessagesActions : CustomerIoInvocable
     }
     
     [Action("Update translation of a transactional message", Description = "Update the body and other data of a specific language variant for a transactional message")]
-    public async Task<EmailTemplateEntity> UpdateTransactionalMessageTranslation(
-        [ActionParameter] TransactionalMessageTranslationRequest input,
+    public async Task<EmailTemplateEntity> UpdateTransactionalMessageTranslation([ActionParameter] TransactionalMessageTranslationRequest input,
         [ActionParameter] UpdateMessageTranslationRequest payload)
     {
         var endpoint = $"v1/transactional/{input.TransactionalMessageId}/language/{input.Language}";

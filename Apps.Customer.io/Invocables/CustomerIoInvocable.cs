@@ -12,7 +12,7 @@ public class CustomerIoInvocable : BaseInvocable
 
     protected CustomerIoClient Client { get; }
 
-    public CustomerIoInvocable(InvocationContext invocationContext) : base(invocationContext)
+    protected CustomerIoInvocable(InvocationContext invocationContext) : base(invocationContext)
     {
         Client = new(Creds);
     }

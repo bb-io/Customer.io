@@ -4,5 +4,5 @@ namespace Apps.Customer.io.Models.Response.Snippet;
 
 public class ListSnippetsResponse
 {
-    public IEnumerable<SnippetEntity> Snippets { get; set; }
+    public IEnumerable<SnippetEntity> Snippets { get; set; } = new List<SnippetEntity>();
 }

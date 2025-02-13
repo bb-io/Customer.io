@@ -12,7 +12,6 @@ public class ConnectionDefinition : IConnectionDefinition
         {
             Name = "Developer API key",
             AuthenticationType = ConnectionAuthenticationType.Undefined,
-            ConnectionUsage = ConnectionUsage.Actions,
             ConnectionProperties = new List<ConnectionProperty>
             {
                 new(CredsNames.ApiKey)

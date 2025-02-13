@@ -8,56 +8,54 @@ namespace Apps.Customer.io.Models.Entity;
 
 public class EmailTemplateEntity
 {
-    [Display("ID")]
-    public string Id { get; set; }
+    [Display("Translation ID")]
+    public string Id { get; set; } = string.Empty;
 
     [Display("Name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    [Display("Creation date")]
-    [JsonConverter(typeof(UnixDateTimeConverter))]
+    [Display("Creation date"), JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime? Created { get; set; }
 
-    [Display("Last updated")]
-    [JsonConverter(typeof(UnixDateTimeConverter))]
+    [Display("Last updated"), JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime? Updated { get; set; }
 
-    public string Body { get; set; }
+    public string Body { get; set; } = string.Empty;
 
-    public string Language { get; set; }
+    public string Language { get; set; } = string.Empty;
 
-    public string Type { get; set; }
+    public string Type { get; set; } = string.Empty;
 
     [Display("From")]
-    public string From { get; set; }
+    public string From { get; set; } = string.Empty;
 
     [Display("From ID")]
-    public string FromId { get; set; }
+    public string FromId { get; set; } = string.Empty;
 
     [Display("Reply to")]
-    public string ReplyTo { get; set; }
+    public string ReplyTo { get; set; } = string.Empty;
 
     [Display("Reply to ID"), JsonProperty("reply_to_id")]
-    public string ReplyToId { get; set; }
+    public string ReplyToId { get; set; } = string.Empty;
 
-    public string Preprocessor { get; set; }
+    public string Preprocessor { get; set; } = string.Empty;
 
-    public string Recipient { get; set; }
+    public string Recipient { get; set; } = string.Empty;
 
-    public string Subject { get; set; }
+    public string Subject { get; set; } = string.Empty;
 
     [Display("BCC")]
-    public string Bcc { get; set; }
+    public string Bcc { get; set; } = string.Empty;
 
     [Display("Fake BCC")]
     public bool FakeBcc { get; set; }
 
     [Display("Preheader text")]
-    public string PreheaderText { get; set; }
+    public string PreheaderText { get; set; } = string.Empty;
     
     [JsonConverter(typeof(EmailHeaderListConverter)), JsonProperty("headers")]
     public List<EmailHeader> Headers { get; set; } = new();
 
     [Display("Amp body")]
-    public string BodyAmp { get; set; }
+    public string BodyAmp { get; set; } = string.Empty;
 }

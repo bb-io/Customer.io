@@ -13,16 +13,11 @@ using RestSharp;
 namespace Apps.Customer.io.Actions;
 
 [ActionList]
-public class BroadcastsActions : CustomerIoInvocable
+public class BroadcastsActions(InvocationContext invocationContext) : CustomerIoInvocable(invocationContext)
 {
-    public BroadcastsActions(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     [Action("Get translation of a broadcast message",
         Description = "Get information about a translation of message in a broadcast")]
-    public async Task<BroadcastActionEntity> GetBroadcastTranslation(
-        [ActionParameter] BroadcastActionRequest input)
+    public async Task<BroadcastActionEntity> GetBroadcastTranslation([ActionParameter] BroadcastActionRequest input)
     {
         var endpoint = $"v1/broadcasts/{input.BroadcastId}/actions/{input.ActionId}/language/{input.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
@@ -33,8 +28,7 @@ public class BroadcastsActions : CustomerIoInvocable
 
     [Action("Update a translation of a broadcast message",
         Description = "Update a translation of a specific broadcast action")]
-    public async Task<BroadcastActionEntity> UpdateBroadcastTranslation(
-        [ActionParameter] BroadcastActionRequest input,
+    public async Task<BroadcastActionEntity> UpdateBroadcastTranslation([ActionParameter] BroadcastActionRequest input,
         [ActionParameter] UpdateBroadcastTranslationRequest payload)
     {
         var endpoint = $"v1/broadcasts/{input.BroadcastId}/actions/{input.ActionId}/language/{input.Language}";

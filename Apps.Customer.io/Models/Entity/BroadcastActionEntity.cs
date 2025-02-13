@@ -8,52 +8,60 @@ namespace Apps.Customer.io.Models.Entity;
 
 public class BroadcastActionEntity
 {
-    [Display("Action ID")] public string Id { get; set; }
+    [Display("Action ID")] 
+    public string Id { get; set; } = string.Empty;
 
-    [Display("Broadcast ID")] public string BroadcastId { get; set; }
+    [Display("Broadcast ID")] 
+    public string BroadcastId { get; set; } = string.Empty;
 
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    public string Layout { get; set; }
+    public string Layout { get; set; } = string.Empty;
 
-    public string Body { get; set; }
+    public string Body { get; set; } = string.Empty;
 
-    public string Type { get; set; }
+    public string Type { get; set; } = string.Empty;
 
-    [Display("Creation date")]
-    [JsonConverter(typeof(UnixDateTimeConverter))]
+    [Display("Creation date"), JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime? Created { get; set; }
 
-    [Display("Last updated")]
-    [JsonConverter(typeof(UnixDateTimeConverter))]
+    [Display("Last updated"), JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime? Updated { get; set; }
 
-    [Display("Sending state")] public string SendingState { get; set; }
+    [Display("Sending state")] 
+    public string SendingState { get; set; } = string.Empty;
 
-    public string Language { get; set; }
+    public string Language { get; set; } = string.Empty;
 
-    public string From { get; set; }
+    public string From { get; set; } = string.Empty;
 
-    [Display("From ID")] public string FromId { get; set; }
+    [Display("From ID")] 
+    public string FromId { get; set; } = string.Empty;
 
-    [Display("Reply to")] public string ReplyTo { get; set; }
+    [Display("Reply to")] 
+    public string ReplyTo { get; set; } = string.Empty;
 
-    [Display("Reply to ID")] public string ReplyToId { get; set; }
+    [Display("Reply to ID")] 
+    public string ReplyToId { get; set; } = string.Empty;
 
-    public string Preprocessor { get; set; }
+    public string Preprocessor { get; set; } = string.Empty;
 
-    public string Recipient { get; set; }
+    public string Recipient { get; set; } = string.Empty;
 
-    public string Subject { get; set; }
+    public string Subject { get; set; } = string.Empty;
 
-    [Display("BCC")] public string Bcc { get; set; }
+    [Display("BCC")] 
+    public string Bcc { get; set; } = string.Empty;
 
-    [Display("Fake BCC")] public bool FakeBcc { get; set; }
+    [Display("Fake BCC")] 
+    public bool FakeBcc { get; set; }
 
-    [Display("Preheader text")] public string PreheaderText { get; set; }
+    [Display("Preheader text")] 
+    public string PreheaderText { get; set; } = string.Empty;
 
     [JsonConverter(typeof(EmailHeaderListConverter)), JsonProperty("headers")]
     public List<EmailHeader> Headers { get; set; } = new();
 
-    [Display("Amp body")] public string BodyAmp { get; set; }
+    [Display("Amp body")] 
+    public string BodyAmp { get; set; } = string.Empty;
 }
