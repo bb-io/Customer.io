@@ -18,7 +18,7 @@ public class ConnectionDefinition : IConnectionDefinition
                 {
                     DisplayName = "API Key",
                     Sensitive = true,
-                     Description = "The app API key for authenticating requests to Customer.io."
+                    Description = "The app API key for authenticating requests to Customer.io."
                 },
                 new(CredsNames.BaseUrl)
                 {

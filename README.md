@@ -13,7 +13,7 @@ Customer.io is a platform that enables businesses to send targeted and personali
 Before you can connect you need to make sure that:
 
 - You have a Customer.io account and have either admin or workspace manager rights.
-- You have an API key for your Customer.io account. You can find your API credentials in Customer.io under _Settings_ > _Account Settings_ > _API Credentials_. More information about API keys can be found [here](https://customer.io/docs/accounts-and-workspaces/managing-credentials/).
+- You have an API key for your Customer.io account. You can find your API credentials in Customer.io under _Experimental features_ > _Account Settings_ > _App API Keys_. More information about API keys can be found [here](https://customer.io/docs/accounts-and-workspaces/managing-credentials/).
 
 ## Connecting
 
