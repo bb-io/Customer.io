@@ -18,12 +18,12 @@ public class TestBase
             AuthenticationCredentialsProviders = Creds,
         };
 
-        FileManager = new FileManager(folderLocation);
+        FileManagementClient = new FileManager(folderLocation);
     }
 
     protected IEnumerable<AuthenticationCredentialsProvider> Creds { get; set; }
 
     public InvocationContext InvocationContext { get; set; }
 
-    public FileManager FileManager { get; set; }
+    public FileManager FileManagementClient { get; set; }
 }

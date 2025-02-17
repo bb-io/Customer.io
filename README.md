@@ -38,6 +38,10 @@ Before you can connect you need to make sure that:
 - **Get a translation of a campaign message** Getting a translation of a campaign message
 - **Update a translation of a campaign message** Updating a translation of a campaign message
 
+### Unified
+- **Download Content**: Downloads content based on the specified ID. To use this action, you must specify the content type to which the content is assigned. Currently, all supported content types are: **Transactional Message, Broadcast Message, Campaign Message, and Newsletter**.
+- **Upload Content**: Uploads content based on the specified ID. This action is used in **pair with `Download Content`** to upload a translated HTML file and update the translation for the specified language.
+
 ## Polling 
 
 - **On broadcast created or updated** Triggered when a new broadcast was created or updated

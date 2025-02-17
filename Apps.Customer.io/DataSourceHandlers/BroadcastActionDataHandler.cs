@@ -19,7 +19,9 @@ public class BroadcastActionDataHandler(
     public async Task<IEnumerable<DataSourceItem>> GetDataAsync(DataSourceContext context, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(BroadcastId))
+        {
             throw new("You have to input Broadcast first");
+        }
 
         var request = new CustomerIoRequest($"v1/broadcasts/{BroadcastId}/actions", Method.Get, Creds);
         var response = await Client.ExecuteWithErrorHandling<ListBroadcastActionsResponse>(request);

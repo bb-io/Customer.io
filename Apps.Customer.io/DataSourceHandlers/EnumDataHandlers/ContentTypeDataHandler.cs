@@ -1,15 +1,17 @@
+﻿using Apps.Customer.io.Constants;
 using Blackbird.Applications.Sdk.Common.Dictionaries;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.Customer.io.DataSourceHandlers.EnumDataHandlers;
 
-public class SendingStateDataHandler : IStaticDataSourceItemHandler
+public class ContentTypeDataHandler : IStaticDataSourceItemHandler
 {
     private static Dictionary<string, string> EnumValues => new()
     {
-        { "broadcast", "Automatic" },
-        { "draft", "Draft" },
-        { "off", "Off" }
+        { ContentTypes.TransactionalMessage, "Transactional message" },
+        { ContentTypes.BroadcastMessage, "Broadcast message" },
+        { ContentTypes.CampaignMessage, "Campaign message" },
+        { ContentTypes.Newsletter, "Newsletter" },
     };
 
     public IEnumerable<DataSourceItem> GetData()

@@ -35,7 +35,6 @@ namespace Apps.Customer.io.Models.Response.TransactionalMessage
         [Display("Layout", Description ="Layout")]
         public string Layout { get; set; }
 
-
         [Display("Created", Description ="Created")]
         public long Created { get; set; } 
 

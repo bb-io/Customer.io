@@ -66,4 +66,10 @@ public class NewsletterTranslationEntity
     
     [JsonConverter(typeof(EmailHeaderListConverter)), JsonProperty("headers")]
     public List<EmailHeader> Headers { get; set; } = new();
+
+    [DefinitionIgnore]
+    public long Created { get; set; }
+    
+    [DefinitionIgnore]
+    public long Updated { get; set; }
 }

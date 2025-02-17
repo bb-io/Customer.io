@@ -10,7 +10,7 @@ namespace Apps.Customer.io.Models.Request.Newsletter
         public string Body { get; set; }
 
         [JsonProperty("body_amp")]
-        public string BodyAmp { get; set; }
+        public string? BodyAmp { get; set; }
 
         [JsonProperty("sending_state")]
         [StaticDataSource(typeof(SendingStateDataHandler))]
