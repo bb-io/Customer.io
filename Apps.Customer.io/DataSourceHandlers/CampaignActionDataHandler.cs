@@ -29,6 +29,6 @@ public class CampaignActionDataHandler(
         return response.Actions
             .Where(action => string.IsNullOrWhiteSpace(context.SearchString) ||
                              action.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .Select(action => new DataSourceItem(action.Id, action.Name));
+            .Select(action => new DataSourceItem(action.Id, $"[{action.Language}] {action.Name}"));
     }
 }
