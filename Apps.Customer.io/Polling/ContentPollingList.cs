@@ -80,28 +80,6 @@ public class ContentPollingList(InvocationContext invocationContext) : CustomerI
         }
 
         if (contentTypesRequest.ContentTypes == null ||
-            contentTypesRequest.ContentTypes.Contains(ContentTypes.CampaignMessage))
-        {
-            var campaignPollingList = new CampaignMessagePollingList(InvocationContext);
-            var result = await campaignPollingList.OnCampaignMessageCreatedOrUpdated(new()
-            {
-                Memory = new CampaignMemory { LastPollingTime = lastPollingTime }
-            }, new CampaignIdentifier { CampaignId = "your_campaign_id" });
-
-            if (result.FlyBird)
-            {
-                content.AddRange(result.Result?.Actions.Select(x => new ContentResponse
-                {
-                    ContentId = x.Id,
-                    Name = x.Name,
-                    ContentType = ContentTypes.CampaignMessage,
-                    CreatedAt = DateTimeOffset.FromUnixTimeSeconds(x.Created).UtcDateTime,
-                    UpdatedAt = DateTimeOffset.FromUnixTimeSeconds(x.Updated).UtcDateTime,
-                }) ?? []);
-            }
-        }
-
-        if (contentTypesRequest.ContentTypes == null ||
             contentTypesRequest.ContentTypes.Contains(ContentTypes.TransactionalMessage))
         {
             var transactionalPollingList = new TransactionalMessagePollingList(InvocationContext);
