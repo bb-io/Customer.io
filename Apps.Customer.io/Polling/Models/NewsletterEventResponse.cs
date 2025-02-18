@@ -17,7 +17,7 @@ namespace Apps.Customer.io.Polling.Models
     public class Newsletter
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty("deduplicate_id")]
         public string DeduplicateId { get; set; }

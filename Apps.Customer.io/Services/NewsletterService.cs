@@ -97,7 +97,7 @@ public class NewsletterService(InvocationContext invocationContext)
             Name = response.Content.Name,
             ContentType = ContentTypes.Newsletter,
             CreatedAt = DateTimeOffset.FromUnixTimeSeconds(response.Content.Created).UtcDateTime,
-            UpdatedAt = DateTimeOffset.FromUnixTimeSeconds(response.Content.Updated).UtcDateTime,
+            UpdatedAt = DateTimeOffset.FromUnixTimeSeconds(response.Content.Updated).UtcDateTime
         };
     }
 }

@@ -5,77 +5,33 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Polling;
 using RestSharp;
 
-namespace Apps.Customer.io.Polling
+namespace Apps.Customer.io.Polling;
+
+[PollingEventList]
+public class BroadcastPollingList(InvocationContext invocationContext) : CustomerIoInvocable(invocationContext)
 {
-    [PollingEventList]
-    public class BroadcastPollingList(InvocationContext invocationContext) : CustomerIoInvocable(invocationContext)
+    [PollingEvent("On broadcasts created or updated", "Triggered when a new broadcasts was created or updated")]
+    public async Task<PollingEventResponse<BroadcastMemory, BroadcastEventResponse>> OnBroadcastCreatedOrUpdated(
+        PollingEventRequest<BroadcastMemory> request)
     {
-        [PollingEvent("On broadcasts created or updated", "Triggered when a new broadcasts was created or updated")]
-        public async Task<PollingEventResponse<BroadcastMemory, BroadcastEventResponse>> OnBroadcastCreatedOrUpdated(
-            PollingEventRequest<BroadcastMemory> request)
+        if (request.Memory is null)
         {
-            if (request.Memory is null)
+            return new()
             {
-                return new()
+                FlyBird = false,
+                Memory = new()
                 {
-                    FlyBird = false,
-                    Memory = new()
-                    {
-                        LastPollingTime = DateTime.UtcNow,
-                        Triggered = false
-                    }
-                };
-            }
+                    LastPollingTime = DateTime.UtcNow,
+                    Triggered = false
+                }
+            };
+        }
 
-            var requestClient = new CustomerIoRequest("v1/broadcasts", Method.Get, Creds);
-            var response = await Client.ExecuteWithErrorHandling<BroadcastEventResponse>(requestClient);
+        var requestClient = new CustomerIoRequest("v1/broadcasts", Method.Get, Creds);
+        var response = await Client.ExecuteWithErrorHandling<BroadcastEventResponse>(requestClient);
 
-            if (response == null || response.Broadcasts == null || !response.Broadcasts.Any())
-            {
-                return new PollingEventResponse<BroadcastMemory, BroadcastEventResponse>
-                {
-                    FlyBird = false,
-                    Memory = new BroadcastMemory
-                    {
-                        LastPollingTime = DateTime.UtcNow,
-                        Triggered = false
-                    }
-                };
-            }
-
-            var lastPollingTime = request.Memory.LastPollingTime ?? DateTime.MinValue;
-
-            var newBroadcasts = response.Broadcasts
-                .Where(b => DateTimeOffset.FromUnixTimeSeconds(b.Created) > lastPollingTime)
-                .OrderByDescending(b => b.Created)
-                .ToList();
-
-            var updatedBroadcasts = response.Broadcasts
-                .Where(b => DateTimeOffset.FromUnixTimeSeconds(b.Updated) > lastPollingTime && b.Created != b.Updated)
-                .ToList();
-
-
-            if (newBroadcasts.Any() || updatedBroadcasts.Any())
-            {
-                var latestEventTime = newBroadcasts
-                    .Concat(updatedBroadcasts)
-                    .Max(b => DateTimeOffset.FromUnixTimeSeconds(b.Updated).UtcDateTime);
-
-                return new PollingEventResponse<BroadcastMemory, BroadcastEventResponse>
-                {
-                    FlyBird = true,
-                    Memory = new BroadcastMemory
-                    {
-                        LastPollingTime = latestEventTime,
-                        Triggered = true
-                    },
-                    Result = new BroadcastEventResponse
-                    {
-                        Broadcasts = newBroadcasts.Concat(updatedBroadcasts).ToList()
-                    }
-                };
-            }
-
+        if (response == null || response.Broadcasts == null || !response.Broadcasts.Any())
+        {
             return new PollingEventResponse<BroadcastMemory, BroadcastEventResponse>
             {
                 FlyBird = false,
@@ -86,5 +42,48 @@ namespace Apps.Customer.io.Polling
                 }
             };
         }
+
+        var lastPollingTime = request.Memory.LastPollingTime ?? DateTime.MinValue;
+
+        var newBroadcasts = response.Broadcasts
+            .Where(b => DateTimeOffset.FromUnixTimeSeconds(b.Created) > lastPollingTime)
+            .OrderByDescending(b => b.Created)
+            .ToList();
+
+        var updatedBroadcasts = response.Broadcasts
+            .Where(b => DateTimeOffset.FromUnixTimeSeconds(b.Updated) > lastPollingTime && b.Created != b.Updated)
+            .ToList();
+
+
+        if (newBroadcasts.Any() || updatedBroadcasts.Any())
+        {
+            var latestEventTime = newBroadcasts
+                .Concat(updatedBroadcasts)
+                .Max(b => DateTimeOffset.FromUnixTimeSeconds(b.Updated).UtcDateTime);
+
+            return new PollingEventResponse<BroadcastMemory, BroadcastEventResponse>
+            {
+                FlyBird = true,
+                Memory = new BroadcastMemory
+                {
+                    LastPollingTime = latestEventTime,
+                    Triggered = true
+                },
+                Result = new BroadcastEventResponse
+                {
+                    Broadcasts = newBroadcasts.Concat(updatedBroadcasts).ToList()
+                }
+            };
+        }
+
+        return new PollingEventResponse<BroadcastMemory, BroadcastEventResponse>
+        {
+            FlyBird = false,
+            Memory = new BroadcastMemory
+            {
+                LastPollingTime = DateTime.UtcNow,
+                Triggered = false
+            }
+        };
     }
 }
