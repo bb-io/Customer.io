@@ -23,14 +23,14 @@ namespace Apps.Customer.io.Actions;
 public class NewslettersActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient)
     : CustomerIoInvocable(invocationContext)
 {
-    [Action("Get translation of a newsletter",
+    [Action("Get translation of newsletter",
         Description = "Get information about a translation of an individual newsletter")]
     public async Task<NewsletterTranslationFileResponse> GetNewsletterTranslation([ActionParameter] NewsletterRequest input)
     {
         return await HandleNewsletterTranslation(input, Method.Get);
     }
 
-    [Action("Update translation of a newsletter", Description = "Update the translation of a newsletter variant")]
+    [Action("Update translation of newsletter", Description = "Update the translation of a newsletter variant")]
     public async Task<NewsletterTranslationFileResponse> UpdateNewsletterTranslation(
         [ActionParameter] NewsletterRequest input,
         [ActionParameter] UpdateNewsletterTranslationEntity payload)
@@ -38,7 +38,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         return await HandleNewsletterTranslation(input, Method.Put, payload);
     }
 
-    [Action("Get a translation of a campaign message", Description = "Get a translation of a campaign message")]
+    [Action("Get translation of campaign message", Description = "Get a translation of a campaign message")]
     public async Task<CampaignMessageTranslationResponse> GetTranslationsForCampaign(
         [ActionParameter] CampaignTranslationRequest input)
     {
@@ -50,7 +50,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         return response ?? new CampaignMessageTranslationResponse();
     }
 
-    [Action("Get a translation of a campaign message as HTML",
+    [Action("Get translation of campaign message as HTML",
         Description = "Get a translation of a campaign message as HTML")]
     public async Task<FileResponse> GetTranslationOfCampaignMessageAsHtmlAsync(
         [ActionParameter] CampaignTranslationRequest input)
@@ -69,7 +69,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         };
     }
 
-    [Action("Update a translation of a campaign message", Description = "Update a translation of a campaign message")]
+    [Action("Update translation of campaign message", Description = "Update a translation of a campaign message")]
     public async Task<CampaignMessageTranslationResponse> UpdateCampaignTranslation(
     [ActionParameter] CampaignTranslationRequest input,
     [ActionParameter] UpdateCampaignTranslationRequest updateRequest)
@@ -84,7 +84,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         return response;
     }
     
-    [Action("Update a translation of a campaign message from HTML", Description = "Update a translation of a campaign message")]
+    [Action("Update translation of campaign message from HTML", Description = "Update a translation of a campaign message")]
     public async Task<CampaignMessageTranslationResponse> UpdateCampaignTranslationFromHtmlAsync(
         [ActionParameter] CampaignTranslationRequest input,
         [ActionParameter] UpdateCampaignTranslationFromHtmlRequest updateRequest)
