@@ -6,13 +6,11 @@ namespace Apps.Customer.io.Models.Request.Broadcast;
 
 public class BroadcastActionRequest
 {
-    [Display("Broadcast")]
-    [DataSource(typeof(BroadcastDataHandler))]
-    public string BroadcastId { get; set; }
-    
-    [Display("Action")]
-    [DataSource(typeof(BroadcastActionDataHandler))]
-    public string ActionId { get; set; }
+    [Display("Broadcast ID"), DataSource(typeof(BroadcastDataHandler))]
+    public string BroadcastId { get; set; } = string.Empty;
+
+    [Display("Action ID"), DataSource(typeof(BroadcastActionDataHandler))]
+    public string ActionId { get; set; } = string.Empty;
     
     public string? Language { get; set; }
 }

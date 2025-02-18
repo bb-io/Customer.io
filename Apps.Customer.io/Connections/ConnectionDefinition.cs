@@ -12,14 +12,13 @@ public class ConnectionDefinition : IConnectionDefinition
         {
             Name = "Developer API key",
             AuthenticationType = ConnectionAuthenticationType.Undefined,
-            ConnectionUsage = ConnectionUsage.Actions,
             ConnectionProperties = new List<ConnectionProperty>
             {
                 new(CredsNames.ApiKey)
                 {
                     DisplayName = "API Key",
                     Sensitive = true,
-                     Description = "The app API key for authenticating requests to Customer.io."
+                    Description = "The app API key for authenticating requests to Customer.io."
                 },
                 new(CredsNames.BaseUrl)
                 {

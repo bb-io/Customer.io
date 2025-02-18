@@ -6,5 +6,5 @@ namespace Apps.Customer.io.Models.Response.TransactionalMessage;
 public class ListMessageTranslationResponse
 {
     [Display("Translation")]
-    public EmailTemplateEntity Content { get; set; }
+    public EmailTemplateEntity Content { get; set; } = new();
 }

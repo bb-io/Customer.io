@@ -13,7 +13,7 @@ Customer.io is a platform that enables businesses to send targeted and personali
 Before you can connect you need to make sure that:
 
 - You have a Customer.io account and have either admin or workspace manager rights.
-- You have an API key for your Customer.io account. You can find your API credentials in Customer.io under _Settings_ > _Account Settings_ > _API Credentials_. More information about API keys can be found [here](https://customer.io/docs/accounts-and-workspaces/managing-credentials/).
+- You have an API key for your Customer.io account. You can find your API credentials in Customer.io under _Experimental features_ > _Account Settings_ > _App API Keys_. More information about API keys can be found [here](https://customer.io/docs/accounts-and-workspaces/managing-credentials/).
 
 ## Connecting
 
@@ -37,6 +37,10 @@ Before you can connect you need to make sure that:
 - **Update translation of a transactional message** Update the body and other data of a specific language variant for a transactional message
 - **Get a translation of a campaign message** Getting a translation of a campaign message
 - **Update a translation of a campaign message** Updating a translation of a campaign message
+
+### Unified
+- **Download Content**: Downloads content based on the specified ID. To use this action, you must specify the content type to which the content is assigned. Currently, all supported content types are: **Transactional Message, Broadcast Message, Campaign Message, and Newsletter**.
+- **Upload Content**: Uploads content based on the specified ID. This action is used in **pair with `Download Content`** to upload a translated HTML file and update the translation for the specified language.
 
 ## Polling 
 

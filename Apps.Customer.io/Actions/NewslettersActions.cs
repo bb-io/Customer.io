@@ -14,6 +14,8 @@ using HtmlAgilityPack;
 using Newtonsoft.Json;
 using RestSharp;
 using System.Text;
+using Apps.Customer.io.Models.Response.Broadcast;
+using Apps.Customer.io.Utils.Converters;
 
 namespace Apps.Customer.io.Actions;
 
@@ -21,15 +23,14 @@ namespace Apps.Customer.io.Actions;
 public class NewslettersActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient)
     : CustomerIoInvocable(invocationContext)
 {
-    [Action("Get translation of a newsletter",
+    [Action("Get translation of newsletter",
         Description = "Get information about a translation of an individual newsletter")]
-    public async Task<NewsletterTranslationFileResponse> GetNewsletterTranslation(
-        [ActionParameter] NewsletterRequest input)
+    public async Task<NewsletterTranslationFileResponse> GetNewsletterTranslation([ActionParameter] NewsletterRequest input)
     {
         return await HandleNewsletterTranslation(input, Method.Get);
     }
 
-    [Action("Update translation of a newsletter", Description = "Update the translation of a newsletter variant")]
+    [Action("Update translation of newsletter", Description = "Update the translation of a newsletter variant")]
     public async Task<NewsletterTranslationFileResponse> UpdateNewsletterTranslation(
         [ActionParameter] NewsletterRequest input,
         [ActionParameter] UpdateNewsletterTranslationEntity payload)
@@ -37,7 +38,77 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         return await HandleNewsletterTranslation(input, Method.Put, payload);
     }
 
-    private async Task<NewsletterTranslationFileResponse> HandleNewsletterTranslation(
+    [Action("Get translation of campaign message", Description = "Get a translation of a campaign message")]
+    public async Task<CampaignMessageTranslationResponse> GetTranslationsForCampaign(
+        [ActionParameter] CampaignTranslationRequest input)
+    {
+        var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
+        var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
+
+        var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
+
+        return response ?? new CampaignMessageTranslationResponse();
+    }
+
+    [Action("Get translation of campaign message as HTML",
+        Description = "Get a translation of a campaign message as HTML")]
+    public async Task<FileResponse> GetTranslationOfCampaignMessageAsHtmlAsync(
+        [ActionParameter] CampaignTranslationRequest input)
+    {
+        var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
+        var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
+
+        var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
+        var htmlStream = CampaignMessageConverter.ToHtmlStream(response);
+        var fileReference =
+            await fileManagementClient.UploadAsync(htmlStream, "text/html", $"{response.Answer.Name}.html");
+
+        return new()
+        {
+            File = fileReference
+        };
+    }
+
+    [Action("Update translation of campaign message", Description = "Update a translation of a campaign message")]
+    public async Task<CampaignMessageTranslationResponse> UpdateCampaignTranslation(
+    [ActionParameter] CampaignTranslationRequest input,
+    [ActionParameter] UpdateCampaignTranslationRequest updateRequest)
+    {
+        var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
+
+        var request = new CustomerIoRequest(endpoint, Method.Put, Creds)
+                .WithJsonBody(updateRequest, JsonConfig.Settings);
+
+        var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
+
+        return response;
+    }
+    
+    [Action("Update translation of campaign message from HTML", Description = "Update a translation of a campaign message")]
+    public async Task<CampaignMessageTranslationResponse> UpdateCampaignTranslationFromHtmlAsync(
+        [ActionParameter] CampaignTranslationRequest input,
+        [ActionParameter] UpdateCampaignTranslationFromHtmlRequest updateRequest)
+    {
+        var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
+        
+        await using var htmlStream = await fileManagementClient.DownloadAsync(updateRequest.File);
+        var memoryStream = new MemoryStream();
+        await htmlStream.CopyToAsync(memoryStream);
+        memoryStream.Position = 0;
+        
+        var campaignMessageEntity = CampaignMessageConverter.ToCampaignMessageEntity(memoryStream);
+        var request = new CustomerIoRequest(endpoint, Method.Put, Creds)
+            .WithJsonBody(new
+            {
+                name = campaignMessageEntity.Name,
+                body = campaignMessageEntity.Body
+            }, JsonConfig.Settings);
+
+        var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
+        return response;
+    }
+    
+        private async Task<NewsletterTranslationFileResponse> HandleNewsletterTranslation(
         NewsletterRequest input,
         Method method,
         UpdateNewsletterTranslationEntity? payload = null)
@@ -73,6 +144,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
 
                 payload.Body = htmlDoc.DocumentNode.OuterHtml;
             }
+            
             request.WithJsonBody(payload, JsonConfig.Settings);
         }
         
@@ -81,8 +153,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var subject = entity.Subject ?? "";
         var preheader = entity.PreheaderText ?? "";
         var body = entity.Body ?? "";
-
-
+        
         var doc = new HtmlDocument();
         doc.LoadHtml(body);
 
@@ -121,34 +192,5 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{entity?.Name} [{entity?.Id}].html");
 
         return new NewsletterTranslationFileResponse(entity ?? new NewsletterTranslationEntity(), fileReference);
-    }
-
-
-
-    [Action("Get a translation of a campaign message", Description = "Get a translation of a campaign message")]
-    public async Task<CampaignMessageTranslationResponse> GetTranslationsForCampaign(
-        [ActionParameter] CampaignTranslationRequest input)
-    {
-        var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
-        var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
-
-        var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
-
-        return response ?? new CampaignMessageTranslationResponse();
-    }
-
-    [Action("Update a translation of a campaign message", Description = "Update a translation of a campaign message")]
-    public async Task<CampaignMessageTranslationResponse> UpdateCampaignTranslation(
-    [ActionParameter] CampaignTranslationRequest input,
-    [ActionParameter] UpdateCampaignTranslationRequest updateRequest)
-    {
-        var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
-
-        var request = new CustomerIoRequest(endpoint, Method.Put, Creds)
-                .WithJsonBody(updateRequest, JsonConfig.Settings);
-
-        var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
-
-        return response;
     }
 }

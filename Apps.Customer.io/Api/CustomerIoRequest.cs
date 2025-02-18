@@ -6,13 +6,9 @@ using RestSharp;
 
 namespace Apps.Customer.io.Api;
 
-public class CustomerIoRequest : BlackBirdRestRequest
+public class CustomerIoRequest(string resource, Method method, IEnumerable<AuthenticationCredentialsProvider> creds)
+    : BlackBirdRestRequest(resource, method, creds)
 {
-    public CustomerIoRequest(string resource, Method method, IEnumerable<AuthenticationCredentialsProvider> creds) :
-        base(resource, method, creds)
-    {
-    }
-
     protected override void AddAuth(IEnumerable<AuthenticationCredentialsProvider> creds)
     {
         var token = creds.Get(CredsNames.ApiKey).Value;

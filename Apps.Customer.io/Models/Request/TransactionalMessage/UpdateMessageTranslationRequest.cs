@@ -8,12 +8,10 @@ public class UpdateMessageTranslationRequest
 {
     public string? Body { get; set; }
 
-    [Display("From ID")]
-    [JsonConverter(typeof(StringToIntConverter), nameof(FromId))]
+    [Display("From ID"), JsonConverter(typeof(StringToIntConverter), nameof(FromId))]
     public string? FromId { get; set; }
 
-    [Display("Reply to ID")]
-    [JsonConverter(typeof(StringToIntConverter), nameof(FromId))]
+    [Display("Reply to ID"), JsonConverter(typeof(StringToIntConverter), nameof(FromId))]
     public string? ReplyToId { get; set; }
 
     public string? Subject { get; set; }

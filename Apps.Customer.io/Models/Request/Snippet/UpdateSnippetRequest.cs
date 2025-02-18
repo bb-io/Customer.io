@@ -1,8 +1,9 @@
+using Blackbird.Applications.Sdk.Common;
+
 namespace Apps.Customer.io.Models.Request.Snippet;
 
-public class UpdateSnippetRequest
+public class UpdateSnippetRequest : SnippetRequest
 {
-    public string Name { get; set; }
-    
-    public string Value { get; set; }
+    [Display("Value")]
+    public string Value { get; set; } = string.Empty;
 }

@@ -11,11 +11,13 @@ public class ConnectionValidator: IConnectionValidator
         IEnumerable<AuthenticationCredentialsProvider> authenticationCredentialsProviders,
         CancellationToken cancellationToken)
     {
-        var client = new CustomerIoClient(authenticationCredentialsProviders.ToArray());
+        var credentialsProviders = authenticationCredentialsProviders as AuthenticationCredentialsProvider[] ?? authenticationCredentialsProviders.ToArray();
+        
+        var client = new CustomerIoClient(credentialsProviders.ToArray());
 
         try
         {
-            var request = new CustomerIoRequest("v1/transactional", Method.Get, authenticationCredentialsProviders);
+            var request = new CustomerIoRequest("v1/transactional", Method.Get, credentialsProviders);
             await client.ExecuteWithErrorHandling(request);
 
             return new()
