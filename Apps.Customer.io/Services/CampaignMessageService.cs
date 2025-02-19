@@ -47,7 +47,7 @@ public class CampaignMessageService(InvocationContext invocationContext)
                 name = campaignMessageEntity.Name,
                 body = campaignMessageEntity.Body
             }, JsonConfig.Settings);
-
+        
         var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
         return new()
         {

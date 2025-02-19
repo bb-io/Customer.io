@@ -62,7 +62,6 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var htmlStream = CampaignMessageConverter.ToHtmlStream(response);
         var fileReference =
             await fileManagementClient.UploadAsync(htmlStream, "text/html", $"{response.Answer.Name}.html");
-
         return new()
         {
             File = fileReference
