@@ -6,10 +6,13 @@ using HtmlAgilityPack;
 
 namespace Apps.Customer.io.Utils.Converters;
 
-public record CampaignMessageEntity(string Id, string Name, string Body);
+public record CampaignMessageEntity(string Id, string Name, string Body, string Subject, string PreHeader);
 
 public static class CampaignMessageConverter
 {
+    private const string DataSectionSubject = "subject";
+    private const string DataSectionPreHeader = "preheader";
+    
     public static Stream ToHtmlStream(CampaignMessageTranslationResponse campaignMessage)
     {
         var htmlDoc = new HtmlDocument();
@@ -29,6 +32,35 @@ public static class CampaignMessageConverter
             InjectMetaTag(headNode, HtmlConstants.ContentId, campaignMessage.Answer.CampaignId.ToString());
             InjectMetaTag(headNode, HtmlConstants.ContentType, ContentTypes.CampaignMessage);
             InjectMetaTag(headNode, HtmlConstants.MessageType, campaignMessage.Answer.Type);
+
+            var bodyNode = htmlDoc.DocumentNode.SelectSingleNode("//body");
+            if (bodyNode == null)
+            {
+                var htmlNode = htmlDoc.DocumentNode.SelectSingleNode("//html");
+                bodyNode = HtmlNode.CreateNode("<body></body>");
+                if (htmlNode != null)
+                {
+                    htmlNode.AppendChild(bodyNode);
+                }
+                else
+                {
+                    htmlDoc.DocumentNode.AppendChild(bodyNode);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(campaignMessage.Answer.PreheaderText))
+            {
+                var preheaderHtml = $"<div data-section='{DataSectionPreHeader}'>{System.Net.WebUtility.HtmlEncode(campaignMessage.Answer.PreheaderText)}</div>";
+                var preheaderNode = HtmlNode.CreateNode(preheaderHtml);
+                bodyNode.PrependChild(preheaderNode);
+            }
+
+            if (!string.IsNullOrEmpty(campaignMessage.Answer.Subject))
+            {
+                var subjectHtml = $"<div data-section='{DataSectionSubject}'>{System.Net.WebUtility.HtmlEncode(campaignMessage.Answer.Subject)}</div>";
+                var subjectNode = HtmlNode.CreateNode(subjectHtml);
+                bodyNode.PrependChild(subjectNode);
+            }
         }
         else
         {
@@ -83,14 +115,17 @@ public static class CampaignMessageConverter
             RemoveMetaTag(htmlDoc, HtmlConstants.ContentId);
             RemoveMetaTag(htmlDoc, HtmlConstants.ContentType);
             RemoveMetaTag(htmlDoc, HtmlConstants.MessageType);
+            
+            string subject = ExtractAndRemoveSection(htmlDoc, DataSectionSubject);
+            string preHeader = ExtractAndRemoveSection(htmlDoc, DataSectionPreHeader);
 
             var fullHtml = htmlDoc.DocumentNode.OuterHtml;
-            return new CampaignMessageEntity(contentId, name, fullHtml);        
+            return new CampaignMessageEntity(contentId, name, fullHtml, subject, preHeader);  
         }
         
         var bodyNode = htmlDoc.DocumentNode.SelectSingleNode("//body");
         var body = bodyNode != null ? System.Net.WebUtility.HtmlDecode(bodyNode.InnerText) : string.Empty;
-        return new CampaignMessageEntity(contentId, name, body);
+        return new CampaignMessageEntity(contentId, name, body, string.Empty, string.Empty);
     }
     
     private static void InjectCommonMetaTags(HtmlNode headElement, string contentId, string messageType)
@@ -117,5 +152,17 @@ public static class CampaignMessageConverter
     private static void RemoveMetaTag(HtmlDocument document, string metaName)
     {
         document.DocumentNode.SelectSingleNode($"//meta[@name='{metaName}']")?.Remove();
+    }
+    
+    private static string ExtractAndRemoveSection(HtmlDocument htmlDoc, string dataSectionName)
+    {
+        var node = htmlDoc.DocumentNode.SelectSingleNode($"//*[@data-section='{dataSectionName}']");
+        if (node != null)
+        {
+            string text = System.Net.WebUtility.HtmlDecode(node.InnerText);
+            node.Remove();
+            return text;
+        }
+        return string.Empty;
     }
 }
