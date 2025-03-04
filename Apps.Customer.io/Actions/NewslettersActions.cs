@@ -100,7 +100,9 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
             .WithJsonBody(new
             {
                 name = campaignMessageEntity.Name,
-                body = campaignMessageEntity.Body
+                body = campaignMessageEntity.Body,
+                subject = campaignMessageEntity.Subject,
+                preheader_text = campaignMessageEntity.PreHeader
             }, JsonConfig.Settings);
 
         var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
