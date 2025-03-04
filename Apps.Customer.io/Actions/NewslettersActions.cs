@@ -56,7 +56,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var actionData = await actionHandler.GetDataAsync(new DataSourceContext(), CancellationToken.None);
         if (!actionData.Any(a => a.Value.Equals(input.ActionId, StringComparison.OrdinalIgnoreCase)))
         {
-            throw new PluginMisconfigurationException("Specifued action not found. Please check the input 'Action ID'.");
+            throw new PluginMisconfigurationException("Specified action not found. Please check the input 'Action ID'.");
         }
 
         var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
@@ -83,7 +83,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var actionData = await actionHandler.GetDataAsync(new DataSourceContext(), CancellationToken.None);
         if (!actionData.Any(a => a.Value.Equals(input.ActionId, StringComparison.OrdinalIgnoreCase)))
         {
-            throw new PluginMisconfigurationException("Specifued action not found. Please check the input 'Action ID'.");
+            throw new PluginMisconfigurationException("Specified action not found. Please check the input 'Action ID'.");
         }
 
         var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
@@ -115,7 +115,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var actionData = await actionHandler.GetDataAsync(new DataSourceContext(), CancellationToken.None);
         if (!actionData.Any(a => a.Value.Equals(input.ActionId, StringComparison.OrdinalIgnoreCase)))
         {
-            throw new PluginMisconfigurationException("Specifued action not found. Please check the input 'Action ID'.");
+            throw new PluginMisconfigurationException("Specified action not found. Please check the input 'Action ID'.");
         }
 
         var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
@@ -144,7 +144,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var actionData = await actionHandler.GetDataAsync(new DataSourceContext(), CancellationToken.None);
         if (!actionData.Any(a => a.Value.Equals(input.ActionId, StringComparison.OrdinalIgnoreCase)))
         {
-            throw new PluginMisconfigurationException("Specifued action not found. Please check the input 'Action ID'.");
+            throw new PluginMisconfigurationException("Specified action not found. Please check the input 'Action ID'.");
         }
 
         var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
