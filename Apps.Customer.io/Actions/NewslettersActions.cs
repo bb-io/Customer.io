@@ -16,6 +16,9 @@ using RestSharp;
 using System.Text;
 using Apps.Customer.io.Models.Response.Broadcast;
 using Apps.Customer.io.Utils.Converters;
+using Apps.Customer.io.DataSourceHandlers;
+using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.Customer.io.Actions;
 
@@ -55,6 +58,20 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
     public async Task<FileResponse> GetTranslationOfCampaignMessageAsHtmlAsync(
         [ActionParameter] CampaignTranslationRequest input)
     {
+        var campaignHandler = new CampaignDataHandler(InvocationContext);
+        var campaignData = await campaignHandler.GetDataAsync(new DataSourceContext(), CancellationToken.None);
+        if (!campaignData.Any(c => c.Value.Equals(input.CampaignId, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new PluginMisconfigurationException("Specified campaign does not exist. Please check the input 'Campaign ID'.");
+        }
+
+        var actionHandler = new CampaignActionDataHandler(InvocationContext, input);
+        var actionData = await actionHandler.GetDataAsync(new DataSourceContext(), CancellationToken.None);
+        if (!actionData.Any(a => a.Value.Equals(input.ActionId, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new PluginMisconfigurationException("Specifued action not found. Please check the input 'Action ID'.");
+        }
+
         var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
 
