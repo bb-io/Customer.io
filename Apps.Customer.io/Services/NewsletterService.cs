@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using Apps.Customer.io.Api;
 using Apps.Customer.io.Constants;
 using Apps.Customer.io.Invocables;
@@ -23,6 +24,15 @@ public class NewsletterService(InvocationContext invocationContext)
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
 
         var entity = response.Content;
+        var responseContent = response.Content.Body;
+        
+        // Extract any content before the <!doctype html> or <html tag
+        string? preHtmlContent = null;
+        var htmlStartMatch = Regex.Match(responseContent, @"(?i)(<(!doctype\s+html|html))");
+        if (htmlStartMatch.Success && htmlStartMatch.Index > 0)
+        {
+            preHtmlContent = responseContent.Substring(0, htmlStartMatch.Index).Trim();
+        }
 
         var doc = new HtmlDocument();
         doc.LoadHtml(entity.Body);
@@ -33,6 +43,11 @@ public class NewsletterService(InvocationContext invocationContext)
         var finalDoc = new HtmlDocument();
 
         var htmlNode = HtmlNode.CreateNode($"<html lang='{language ?? "en"}'></html>");
+        if (!string.IsNullOrEmpty(preHtmlContent))
+        {
+            // Store pre-HTML content in a custom data attribute
+            htmlNode.SetAttributeValue(HtmlConstants.PreHtmlContent, System.Net.WebUtility.HtmlEncode(preHtmlContent));
+        }
         
         var headNode = HtmlNode.CreateNode("<head></head>");
         headNode.AppendChild(HtmlNode.CreateNode("<meta charset='UTF-8'>"));
@@ -84,7 +99,24 @@ public class NewsletterService(InvocationContext invocationContext)
         subjectNode?.Remove();
         preHeaderNode?.Remove();
         
-        payload.Body = doc.DocumentNode.OuterHtml;
+        // Extract the pre-HTML content if present
+        var htmlNode = doc.DocumentNode.SelectSingleNode("//html");
+        string finalHtml = doc.DocumentNode.OuterHtml;
+        if (htmlNode != null && htmlNode.Attributes[HtmlConstants.PreHtmlContent] != null)
+        {
+            var preHtmlContent = System.Net.WebUtility.HtmlDecode(htmlNode.GetAttributeValue(HtmlConstants.PreHtmlContent, string.Empty));
+            if (!string.IsNullOrEmpty(preHtmlContent))
+            {
+                // Remove the custom attribute from the HTML before sending it back
+                htmlNode.Attributes.Remove(HtmlConstants.PreHtmlContent);
+                finalHtml = doc.DocumentNode.OuterHtml;
+                
+                // Prepend the original pre-HTML content
+                finalHtml = preHtmlContent + Environment.NewLine + Environment.NewLine + finalHtml;
+            }
+        }
+        
+        payload.Body = finalHtml;
         
         var endpoint = $"v1/newsletters/{contentId}/language/{language}";
         var request = new CustomerIoRequest(endpoint, Method.Put, Creds)
