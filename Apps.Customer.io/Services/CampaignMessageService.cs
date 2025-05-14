@@ -27,20 +27,19 @@ public class CampaignMessageService(InvocationContext invocationContext)
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
-        return CampaignMessageConverter.ToHtmlStream(response);
+        return CampaignMessageConverter.ToHtmlStream(response, actionId);
     }
 
     public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, string? language, string? actionId)
     {         
-        if (string.IsNullOrEmpty(actionId))
-        {
-            throw new PluginMisconfigurationException(
-                "'Action ID' is null or empty, but it is a required input for the 'Campaign message' content type. " +
-                "Please provide an 'Action ID' for this action.");
-        }
-        
         var campaignMessageEntity = CampaignMessageConverter.ToCampaignMessageEntity(htmlStream);
-        var endpoint = $"v1/campaigns/{campaignMessageEntity.Id}/actions/{actionId}/language/{language}";
+        var actualActionId = string.IsNullOrEmpty(actionId) ? campaignMessageEntity.ActionId : actionId;
+        if(string.IsNullOrEmpty(actualActionId))
+        {
+            throw new PluginMisconfigurationException(ExceptionMessages.CouldntFindActionIdInHtml);
+        }
+
+        var endpoint = $"v1/campaigns/{campaignMessageEntity.Id}/actions/{actualActionId}/language/{language}";
         var request = new CustomerIoRequest(endpoint, Method.Put, Creds)
             .WithJsonBody(new
             {

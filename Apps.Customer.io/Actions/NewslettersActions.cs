@@ -90,7 +90,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
-        var htmlStream = CampaignMessageConverter.ToHtmlStream(response);
+        var htmlStream = CampaignMessageConverter.ToHtmlStream(response, input.ActionId);
         var fileReference =
             await fileManagementClient.UploadAsync(htmlStream, "text/html", $"{response.Answer.Name}.html");
         return new()

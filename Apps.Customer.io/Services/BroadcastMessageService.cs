@@ -31,7 +31,7 @@ public class BroadcastMessageService(InvocationContext invocationContext)
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithErrorHandling<BroadcastTranslationResponse>(request);
-        var bodyHtml = response.Action.Body; 
+        var bodyHtml = response.Action.Body;
 
         var doc = new HtmlDocument();
         doc.LoadHtml(bodyHtml);
@@ -51,33 +51,34 @@ public class BroadcastMessageService(InvocationContext invocationContext)
             }
         }
 
-        InjectMetaTag(headNode, "blackbird-content-id", contentId);
-        InjectMetaTag(headNode, "blackbird-content-type", "newsletter");
+        InjectMetaTag(headNode, HtmlConstants.ContentId, contentId);
+        InjectMetaTag(headNode, HtmlConstants.ActionId, actionId);
+        InjectMetaTag(headNode, HtmlConstants.ContentType, "newsletter");
 
         var modifiedHtml = doc.DocumentNode.OuterHtml;
         return new MemoryStream(Encoding.UTF8.GetBytes(modifiedHtml));
     }
-    
+
     public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, string? language, string? actionId)
     {
-        if (string.IsNullOrEmpty(actionId))
-        {
-            throw new PluginMisconfigurationException(
-                "'Action ID' is null or empty, but it is a required input for the 'Broadcast message' content type. " +
-                "Please provide an 'Action ID' for this action.");
-        }
-        
         var bytes = await htmlStream.GetByteData();
         var htmlString = Encoding.Default.GetString(bytes);
 
         var doc = new HtmlDocument();
         doc.LoadHtml(htmlString);
 
-        var contentIdNode = doc.DocumentNode.SelectSingleNode("//meta[@name='blackbird-content-id']");
+        var contentIdNode = doc.DocumentNode.SelectSingleNode($"//meta[@name='{HtmlConstants.ContentId}']");
+        var actionIdNode = doc.DocumentNode.SelectSingleNode($"//meta[@name='{HtmlConstants.ActionId}']");
+
+        if (string.IsNullOrEmpty(actionId) && string.IsNullOrEmpty(actionIdNode?.InnerHtml))
+        {
+            throw new PluginApplicationException(ExceptionMessages.CouldntFindActionIdInHtml);
+        }
+
         var broadcastEntity = await UpdateBroadcastTranslation(new BroadcastActionRequest()
         {
-            BroadcastId = contentIdNode.InnerText, 
-            ActionId = actionId,
+            BroadcastId = contentIdNode.InnerText,
+            ActionId = actionId ?? actionIdNode.InnerText,
             Language = language
         }, new()
         {
@@ -104,7 +105,7 @@ public class BroadcastMessageService(InvocationContext invocationContext)
         var response = await Client.ExecuteWithErrorHandling<BroadcastTranslationResponse>(request);
         return response.Action;
     }
-    
+
     private void InjectMetaTag(HtmlNode headNode, string metaName, string metaContent)
     {
         var existingMeta = headNode.SelectSingleNode($"//meta[@name='{metaName}']");

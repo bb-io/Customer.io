@@ -54,6 +54,11 @@ public class NewsletterService(InvocationContext invocationContext)
         headNode.AppendChild(HtmlNode.CreateNode("<meta name='viewport' content='width=device-width, initial-scale=1.0'>"));
 
         headNode.AppendChild(HtmlNode.CreateNode($"<meta name='{HtmlConstants.ContentId}' content='{System.Net.WebUtility.HtmlEncode(contentId)}'>"));
+        if(actionId != null)
+        {
+            headNode.AppendChild(HtmlNode.CreateNode($"<meta name='{HtmlConstants.ActionId}' content='{System.Net.WebUtility.HtmlEncode(actionId)}'>"));
+        }
+        
         headNode.AppendChild(HtmlNode.CreateNode($"<meta name='{HtmlConstants.ContentType}' content='{ContentTypes.Newsletter}'>"));
         
         headNode.AppendChild(HtmlNode.CreateNode($"<title>{System.Net.WebUtility.HtmlEncode(entity.Subject)}</title>"));
