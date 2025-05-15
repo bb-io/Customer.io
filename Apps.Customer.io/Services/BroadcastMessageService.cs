@@ -70,15 +70,19 @@ public class BroadcastMessageService(InvocationContext invocationContext)
         var contentIdNode = doc.DocumentNode.SelectSingleNode($"//meta[@name='{HtmlConstants.ContentId}']");
         var actionIdNode = doc.DocumentNode.SelectSingleNode($"//meta[@name='{HtmlConstants.ActionId}']");
 
-        if (string.IsNullOrEmpty(actionId) && string.IsNullOrEmpty(actionIdNode?.InnerHtml))
+        var actualContentId = contentIdNode?.GetAttributeValue("content", null) ??
+            throw new PluginApplicationException(ExceptionMessages.CouldntFindContentIdInHtml);
+        var actualActionId = actionId ?? actionIdNode?.GetAttributeValue("content", null);
+
+        if (string.IsNullOrEmpty(actualActionId))
         {
             throw new PluginApplicationException(ExceptionMessages.CouldntFindActionIdInHtml);
         }
 
         var broadcastEntity = await UpdateBroadcastTranslation(new BroadcastActionRequest()
         {
-            BroadcastId = contentIdNode.InnerText,
-            ActionId = actionId ?? actionIdNode.InnerText,
+            BroadcastId = actualContentId,
+            ActionId = actualActionId,
             Language = language
         }, new()
         {
