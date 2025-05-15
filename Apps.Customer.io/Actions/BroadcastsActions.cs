@@ -43,7 +43,7 @@ public class BroadcastsActions(InvocationContext invocationContext, IFileManagem
         await writer.FlushAsync();
         stream.Position = 0;
 
-        var file = await fileManagementClient.UploadAsync(stream, "text/html", $"{response.Action.Id}.html");
+        var file = await fileManagementClient.UploadAsync(stream, "text/html", $"{input.BroadcastId}_{response.Action.Id}.html");
         return new FileResponse
         {
             File = file
