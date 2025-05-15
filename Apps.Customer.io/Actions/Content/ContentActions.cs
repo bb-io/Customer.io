@@ -23,8 +23,11 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
         var stream = await service.DownloadContentAsync(contentRequest.ContentId, contentRequest.Language,
             contentRequest.ActionId);
 
-        var fileReference = await fileManagementClient.UploadAsync(stream, "text/html",
-            $"[{contentRequest.ContentType}] {contentRequest.ContentId}.html");
+        var fileName = string.IsNullOrEmpty(contentRequest.ActionId)
+            ? $"{contentRequest.ContentId}.html"
+            : $"{contentRequest.ContentId}_{contentRequest.ActionId}.html";
+
+        var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", fileName);
 
         return new()
         {
