@@ -104,6 +104,7 @@ public static class CampaignMessageConverter
         var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//title");
 
         var actionIdNode = htmlDoc.DocumentNode.SelectSingleNode($"//meta[@name='{HtmlConstants.ActionId}']");
+        var actionID = actionIdNode is null ? "" : actionIdNode.InnerText;
 
         var name = titleNode != null ? System.Net.WebUtility.HtmlDecode(titleNode.InnerText) : string.Empty;
         var contentId = contentIdNode?.GetAttributeValue("content", string.Empty) ??
@@ -123,7 +124,7 @@ public static class CampaignMessageConverter
             string preHeader = ExtractAndRemoveSection(htmlDoc, DataSectionPreHeader);
 
             var fullHtml = htmlDoc.DocumentNode.OuterHtml;
-            return new CampaignMessageEntity(contentId, actionIdNode.InnerText, name, fullHtml, subject, preHeader);  
+            return new CampaignMessageEntity(contentId, actionID, name, fullHtml, subject, preHeader);  
         }
         
         var bodyNode = htmlDoc.DocumentNode.SelectSingleNode("//body");
