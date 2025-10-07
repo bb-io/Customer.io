@@ -49,6 +49,35 @@ Before you can connect you need to make sure that:
 - **On campaign message created or updated** Triggered when a campaign message is created or updated
 - **On transactional message created or updated** Triggered when a transactional message is created or updated
 
+## Known Customer.io API limitations
+
+### Drag-and-Drop editor content cannot be translated
+
+Customer.io's API does not support translating content created with their drag-and-drop editor. This is an API limitation that affects all newsletters and broadcast messages created using the drag-and-drop editor.
+
+Unfortunately, the API does not provide a way to automatically notify you if content was created using the drag-and-drop editor.
+
+**How to identify this issue:**
+
+When attempting to download or update translations, the body content may not be retrieved or updated correctly.
+
+**Workaround:**
+
+To enable translation of newsletter content:
+
+1. Export the HTML from the English version of your email
+2. Create a new broadcast or newsletter in Customer.io
+3. Select **"Code"** as the content type (not drag-and-drop)
+4. Paste the exported HTML into the Code editor
+5. Copy the title and pre-header from the original newsletter
+6. Use Blackbird to download and translate the content as normal
+
+**Important:** While your content team can continue authoring emails using the drag-and-drop editor, they will need to manually copy the content to a "Code" email before it can be localized through Blackbird or any other automation.
+
+This limitation applies to all email messages created with drag-and-drop editor:
+- Broadcast messages
+- Newsletters
+- Campaign messages
 
 ## Feedback
 
