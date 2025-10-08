@@ -7,7 +7,7 @@ using RestSharp;
 
 namespace Apps.Customer.io.Polling;
 
-[PollingEventList]
+[PollingEventList("Transactional messages")]
 public class TransactionalMessagePollingList(InvocationContext invocationContext)
     : CustomerIoInvocable(invocationContext)
 {

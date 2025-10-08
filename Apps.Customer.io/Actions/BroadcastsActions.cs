@@ -15,7 +15,7 @@ using RestSharp;
 
 namespace Apps.Customer.io.Actions;
 
-[ActionList]
+[ActionList("Broadcasts")]
 public class BroadcastsActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : CustomerIoInvocable(invocationContext)
 {
     [Action("Get broadcast message",

@@ -7,7 +7,7 @@ using RestSharp;
 
 namespace Apps.Customer.io.Polling;
 
-[PollingEventList]
+[PollingEventList("Newsletters")]
 public class NewsletterPollingList(InvocationContext invocationContext) : CustomerIoInvocable(invocationContext)
 {
     [PollingEvent("On newsletters created or updated", "Triggered when a newsletters is created or updated")]

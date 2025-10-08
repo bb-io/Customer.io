@@ -16,7 +16,7 @@ using RestSharp;
 
 namespace Apps.Customer.io.Actions;
 
-[ActionList]
+[ActionList("Snippets")]
 public class SnippetsActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : CustomerIoInvocable(invocationContext)
 {
     [Action("Search snippets", Description = "Returns all snippets in the workspace")]
