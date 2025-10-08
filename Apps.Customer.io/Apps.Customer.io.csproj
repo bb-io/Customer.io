@@ -6,15 +6,14 @@
         <Nullable>enable</Nullable>
         <Product>Customer.io</Product>
         <Description>Customer engagement platform</Description>
-        <Version>1.2.7</Version>
+        <Version>1.2.8</Version>
         <AssemblyName>Apps.Customer.io</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Blackbird.Applications.Sdk.Common" Version="2.11.0" />
+        <PackageReference Include="Blackbird.Applications.SDK.Blueprints" Version="1.0.0-rc.10308" />
         <PackageReference Include="Blackbird.Applications.SDK.Extensions.FileManagement" Version="1.0.2-alpha1" />
-        <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.12" />
-        <PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
+        <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.26" />
     </ItemGroup>
 
     <ItemGroup>
