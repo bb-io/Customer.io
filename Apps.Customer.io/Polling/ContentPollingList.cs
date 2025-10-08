@@ -8,7 +8,7 @@ using Blackbird.Applications.Sdk.Common.Polling;
 
 namespace Apps.Customer.io.Polling;
 
-[PollingEventList]
+[PollingEventList("Content")]
 public class ContentPollingList(InvocationContext invocationContext) : CustomerIoInvocable(invocationContext)
 {
     [PollingEvent("On content created or updated",

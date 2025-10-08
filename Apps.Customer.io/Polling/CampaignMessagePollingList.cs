@@ -7,7 +7,7 @@ using RestSharp;
 
 namespace Apps.Customer.io.Polling;
 
-[PollingEventList]
+[PollingEventList("Campaigns")]
 public class CampaignMessagePollingList(InvocationContext invocationContext) : CustomerIoInvocable(invocationContext)
 {
     [PollingEvent("On campaign messages created or updated",

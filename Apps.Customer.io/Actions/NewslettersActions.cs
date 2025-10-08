@@ -11,7 +11,6 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using HtmlAgilityPack;
-using Newtonsoft.Json;
 using RestSharp;
 using System.Text;
 using Apps.Customer.io.Models.Response.Broadcast;
@@ -22,7 +21,7 @@ using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.Customer.io.Actions;
 
-[ActionList]
+[ActionList("Newsletters")]
 public class NewslettersActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient)
     : CustomerIoInvocable(invocationContext)
 {

@@ -10,7 +10,7 @@ using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 
 namespace Apps.Customer.io.Actions.Content;
 
-[ActionList]
+[ActionList("Content")]
 public class ContentActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient)
     : CustomerIoInvocable(invocationContext)
 {
