@@ -5,6 +5,7 @@ using Apps.Customer.io.Models.Response.Content;
 using Apps.Customer.io.Services.Factories;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 
@@ -38,6 +39,11 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
     [Action("Upload content", Description = "Update content from HTML file")]
     public async Task<ContentResponse> UploadContent([ActionParameter] UploadContentRequest uploadContentRequest)
     {
+        if (String.IsNullOrEmpty(uploadContentRequest.Language))
+        {
+            throw new PluginMisconfigurationException("Language input cannot be empty.");
+        }
+
         var service = _contentServiceFactory.GetService(uploadContentRequest.ContentType);
         var fileStream = await fileManagementClient.DownloadAsync(uploadContentRequest.File);
         
