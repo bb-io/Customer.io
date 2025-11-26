@@ -13,6 +13,7 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
+using System.Net.Mime;
 
 namespace Apps.Customer.io.Actions;
 
@@ -37,7 +38,7 @@ public class TransactionalMessagesActions(InvocationContext invocationContext, I
 
         var response = await Client.ExecuteWithErrorHandling<ListMessageTranslationResponse>(request);
         var stream = TransactionalMessageConverter.ToHtmlStream(response.Content, input.TransactionalMessageId);
-        var file = await fileManagementClient.UploadAsync(stream, "text/html", $"{response.Content.Id}.html");
+        var file = await fileManagementClient.UploadAsync(stream, MediaTypeNames.Text.Html, $"{response.Content.Id}.html");
         return new FileResponse
         {
             File = file

@@ -13,6 +13,7 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
+using System.Net.Mime;
 
 namespace Apps.Customer.io.Actions;
 
@@ -35,7 +36,7 @@ public class SnippetsActions(InvocationContext invocationContext, IFileManagemen
                           $"Could not find a snippet with provided name: {snippetRequest.SnippetName}");
 
         var htmlStream = SnippetHtmlConverter.ToHtmlStream(snippet);
-        var fileReference = await fileManagementClient.UploadAsync(htmlStream, "text/html", $"{snippet.Name}.html");
+        var fileReference = await fileManagementClient.UploadAsync(htmlStream, MediaTypeNames.Text.Html, $"{snippet.Name}.html");
         return new()
         {
             File = fileReference
