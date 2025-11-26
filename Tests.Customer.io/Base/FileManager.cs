@@ -1,5 +1,6 @@
 ﻿using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using System.Text;
 
 namespace Tests.Customer.io.Base;
 
@@ -24,5 +25,12 @@ public class FileManager(string folderLocation) : IFileManagementClient
         }
 
         return Task.FromResult(new FileReference { Name = fileName });
+    }
+
+    public string ReadOutputAsString(FileReference reference)
+    {
+        var path = Path.Combine(folderLocation, @$"Output\{reference.Name}");
+        Assert.IsTrue(File.Exists(path), $"File not found at: {path}");
+        return File.ReadAllText(path, Encoding.UTF8)!;
     }
 }

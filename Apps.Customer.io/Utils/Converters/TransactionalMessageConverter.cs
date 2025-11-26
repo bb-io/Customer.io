@@ -1,8 +1,10 @@
-﻿using System.Text;
-using Apps.Customer.io.Constants;
+﻿using Apps.Customer.io.Constants;
 using Apps.Customer.io.Models.Entity;
+using Apps.Customer.io.Models.Response;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace Apps.Customer.io.Utils.Converters;
 
@@ -48,6 +50,19 @@ public static class TransactionalMessageConverter
     {
         using var reader = new StreamReader(htmlStream, Encoding.UTF8);
         var htmlContent = reader.ReadToEnd();
+
+        if (htmlContent.IsJson())
+        {
+            var content = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(htmlContent);
+            if (content is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
+
+            return new EmailTemplateEntity
+            {
+                Id = content.ContentId ?? throw new PluginApplicationException("Missing 'contentId' in the uploaded JSON."),
+                Name = content.Name?.ToString() ?? throw new PluginApplicationException("Missing 'name' in the uploaded JSON."),
+                Body = content.ToString() ?? throw new PluginApplicationException("Missing 'body' in the uploaded JSON."),
+            };
+        }
 
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlContent);

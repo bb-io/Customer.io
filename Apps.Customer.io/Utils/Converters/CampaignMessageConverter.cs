@@ -1,12 +1,15 @@
-﻿using System.Text;
-using Apps.Customer.io.Constants;
+﻿using Apps.Customer.io.Constants;
+using Apps.Customer.io.Models.Response;
 using Apps.Customer.io.Models.Response.TransactionalMessage;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
+using System.Text;
+using System.Web;
 
 namespace Apps.Customer.io.Utils.Converters;
 
-public record CampaignMessageEntity(string Id, string ActionId, string Name, string Body, string Subject, string PreHeader);
+public record CampaignMessageEntity(string Id, string ActionId, string Name, object Body, string Subject, string PreHeader);
 
 public static class CampaignMessageConverter
 {
@@ -97,6 +100,19 @@ public static class CampaignMessageConverter
         using var reader = new StreamReader(htmlStream, Encoding.UTF8);
         var htmlContent = reader.ReadToEnd();
 
+        if (htmlContent.IsJson())
+        {
+            var content = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(htmlContent);
+            if (content is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
+
+            return new CampaignMessageEntity(
+                content.ContentId ?? throw new PluginApplicationException("Missing 'contentId' in the uploaded JSON."), 
+                content.ActionId ?? throw new PluginApplicationException("Missing 'actionId' in the uploaded JSON."),
+                content.Name?.ToString() ?? throw new PluginApplicationException("Missing 'name' in the uploaded JSON."),
+                content.Body ?? throw new PluginApplicationException("Missing 'body' in the uploaded JSON."),
+                string.Empty, string.Empty);
+        }
+
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlContent);
 
@@ -104,7 +120,7 @@ public static class CampaignMessageConverter
         var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//title");
 
         var actionIdNode = htmlDoc.DocumentNode.SelectSingleNode($"//meta[@name='{HtmlConstants.ActionId}']");
-        var actionID = actionIdNode is null ? "" : actionIdNode.InnerText;
+        var actionId = actionIdNode is null ? "" : actionIdNode.InnerText;
 
         var name = titleNode != null ? System.Net.WebUtility.HtmlDecode(titleNode.InnerText) : string.Empty;
         var contentId = contentIdNode?.GetAttributeValue("content", string.Empty) ??
@@ -124,12 +140,12 @@ public static class CampaignMessageConverter
             string preHeader = ExtractAndRemoveSection(htmlDoc, DataSectionPreHeader);
 
             var fullHtml = htmlDoc.DocumentNode.OuterHtml;
-            return new CampaignMessageEntity(contentId, actionID, name, fullHtml, subject, preHeader);  
+            return new CampaignMessageEntity(contentId, actionId, name, fullHtml, subject, preHeader);  
         }
         
         var bodyNode = htmlDoc.DocumentNode.SelectSingleNode("//body");
         var body = bodyNode != null ? System.Net.WebUtility.HtmlDecode(bodyNode.InnerText) : string.Empty;
-        return new CampaignMessageEntity(contentId, actionIdNode.InnerText, name, body, string.Empty, string.Empty);
+        return new CampaignMessageEntity(contentId, actionId, name, body, string.Empty, string.Empty);
     }
     
     private static void InjectCommonMetaTags(HtmlNode headElement, string contentId, string messageType)

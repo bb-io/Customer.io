@@ -1,27 +1,46 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
-using Apps.Customer.io.Api;
+﻿using Apps.Customer.io.Api;
 using Apps.Customer.io.Constants;
 using Apps.Customer.io.Invocables;
 using Apps.Customer.io.Models.Entity;
+using Apps.Customer.io.Models.Request.Broadcast;
+using Apps.Customer.io.Models.Response;
 using Apps.Customer.io.Models.Response.Content;
 using Apps.Customer.io.Models.Response.Newsletter;
+using Apps.Customer.io.Utils;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
 using RestSharp;
+using System.Net.Mime;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Apps.Customer.io.Services;
 
 public class NewsletterService(InvocationContext invocationContext)
     : CustomerIoInvocable(invocationContext), IContentService
 {
-    public async Task<Stream> DownloadContentAsync(string contentId, string? language, string? actionId)
+    public async Task<Stream> DownloadContentAsync(string contentId, string? language, string? actionId, string fileFormat)
     {
         var endpoint = $"v1/newsletters/{contentId}/language/{language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
+
+        if (fileFormat == MediaTypeNames.Application.Json)
+        {
+            var wrappedContent = new JsonResponseWithMetadata
+            {
+                ContentId = contentId,
+                ActionId = actionId,
+                ContentType = ContentTypes.Newsletter,
+                Name = response.Content.Name,
+                Body = response.Content.Body,
+            };
+            var json = JsonConvert.SerializeObject(wrappedContent, Formatting.Indented);
+            return new MemoryStream(Encoding.UTF8.GetBytes(json));
+        }
 
         var entity = response.Content;
         var responseContent = response.Content.Body;
@@ -85,43 +104,55 @@ public class NewsletterService(InvocationContext invocationContext)
     public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, string? language, string? actionId)
     {
         var htmlString = await new StreamReader(htmlStream, Encoding.UTF8).ReadToEndAsync();
-        var doc = new HtmlDocument();
-        doc.LoadHtml(htmlString);
 
-        var contentIdNode = doc.DocumentNode.SelectSingleNode("//meta[@name='blackbird-content-id']");
-        var contentId = contentIdNode?.GetAttributeValue("content", string.Empty) ?? 
-                        throw new PluginApplicationException("Missing 'blackbird-content-id' in the uploaded HTML.");
+        var payload = new UpdateNewsletterTranslationEntity();
+        var contentId = string.Empty;
 
-        var subjectNode = doc.DocumentNode.SelectSingleNode("//div[@id='subject']");
-        var preHeaderNode = doc.DocumentNode.SelectSingleNode("//div[@id='preheader']");
-
-        var payload = new UpdateNewsletterTranslationEntity
+        if (htmlString.IsJson())
         {
-            Subject = subjectNode?.InnerText.Trim(),
-            PreheaderText = preHeaderNode?.InnerText.Trim()
-        };
-        
-        subjectNode?.Remove();
-        preHeaderNode?.Remove();
-        
-        // Extract the pre-HTML content if present
-        var htmlNode = doc.DocumentNode.SelectSingleNode("//html");
-        string finalHtml = doc.DocumentNode.OuterHtml;
-        if (htmlNode != null && htmlNode.Attributes[HtmlConstants.PreHtmlContent] != null)
+            var content = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(htmlString);
+            if (content is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
+            payload.Subject = content.Name?.ToString();
+            payload.PreheaderText = string.Empty;
+            payload.Body = content.Body?.ToString();
+            contentId = content.ContentId;
+        } else
         {
-            var preHtmlContent = System.Net.WebUtility.HtmlDecode(htmlNode.GetAttributeValue(HtmlConstants.PreHtmlContent, string.Empty));
-            if (!string.IsNullOrEmpty(preHtmlContent))
+            var doc = new HtmlDocument();
+            doc.LoadHtml(htmlString);
+
+            var contentIdNode = doc.DocumentNode.SelectSingleNode("//meta[@name='blackbird-content-id']");
+            contentId = contentIdNode?.GetAttributeValue("content", string.Empty) ??
+                            throw new PluginApplicationException("Missing 'blackbird-content-id' in the uploaded HTML.");
+
+            var subjectNode = doc.DocumentNode.SelectSingleNode("//div[@id='subject']");
+            var preHeaderNode = doc.DocumentNode.SelectSingleNode("//div[@id='preheader']");
+
+            payload.Subject = subjectNode?.InnerText.Trim();
+            payload.PreheaderText = preHeaderNode?.InnerText.Trim();
+
+            subjectNode?.Remove();
+            preHeaderNode?.Remove();
+
+            // Extract the pre-HTML content if present
+            var htmlNode = doc.DocumentNode.SelectSingleNode("//html");
+            string finalHtml = doc.DocumentNode.OuterHtml;
+            if (htmlNode != null && htmlNode.Attributes[HtmlConstants.PreHtmlContent] != null)
             {
-                // Remove the custom attribute from the HTML before sending it back
-                htmlNode.Attributes.Remove(HtmlConstants.PreHtmlContent);
-                finalHtml = doc.DocumentNode.OuterHtml;
-                
-                // Prepend the original pre-HTML content
-                finalHtml = preHtmlContent + Environment.NewLine + Environment.NewLine + finalHtml;
+                var preHtmlContent = System.Net.WebUtility.HtmlDecode(htmlNode.GetAttributeValue(HtmlConstants.PreHtmlContent, string.Empty));
+                if (!string.IsNullOrEmpty(preHtmlContent))
+                {
+                    // Remove the custom attribute from the HTML before sending it back
+                    htmlNode.Attributes.Remove(HtmlConstants.PreHtmlContent);
+                    finalHtml = doc.DocumentNode.OuterHtml;
+
+                    // Prepend the original pre-HTML content
+                    finalHtml = preHtmlContent + Environment.NewLine + Environment.NewLine + finalHtml;
+                }
             }
-        }
-        
-        payload.Body = finalHtml;
+
+            payload.Body = finalHtml;
+        }        
         
         var endpoint = $"v1/newsletters/{contentId}/language/{language}";
         var request = new CustomerIoRequest(endpoint, Method.Put, Creds)

@@ -12,6 +12,7 @@ using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
+using System.Net.Mime;
 
 namespace Apps.Customer.io.Actions;
 
@@ -43,7 +44,7 @@ public class BroadcastsActions(InvocationContext invocationContext, IFileManagem
         await writer.FlushAsync();
         stream.Position = 0;
 
-        var file = await fileManagementClient.UploadAsync(stream, "text/html", $"{input.BroadcastId}_{response.Action.Id}.html");
+        var file = await fileManagementClient.UploadAsync(stream, MediaTypeNames.Text.Html, $"{input.BroadcastId}_{response.Action.Id}.html");
         return new FileResponse
         {
             File = file

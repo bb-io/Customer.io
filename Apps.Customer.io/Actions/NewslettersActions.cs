@@ -18,6 +18,7 @@ using Apps.Customer.io.Utils.Converters;
 using Apps.Customer.io.DataSourceHandlers;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Exceptions;
+using System.Net.Mime;
 
 namespace Apps.Customer.io.Actions;
 
@@ -91,7 +92,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
         var htmlStream = CampaignMessageConverter.ToHtmlStream(response, input.ActionId);
         var fileReference =
-            await fileManagementClient.UploadAsync(htmlStream, "text/html", $"{response.Answer.Name}.html");
+            await fileManagementClient.UploadAsync(htmlStream, MediaTypeNames.Text.Html, $"{response.Answer.Name}.html");
         return new()
         {
             File = fileReference
@@ -248,7 +249,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
                     </html>";
 
         await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(html));
-        var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", $"{entity?.Name} [{entity?.Id}].html");
+        var fileReference = await fileManagementClient.UploadAsync(stream, MediaTypeNames.Text.Html, $"{entity?.Name} [{entity?.Id}].html");
 
         return new NewsletterTranslationFileResponse(entity ?? new NewsletterTranslationEntity(), fileReference);
     }

@@ -1,20 +1,24 @@
 ﻿using Apps.Customer.io.Api;
 using Apps.Customer.io.Constants;
 using Apps.Customer.io.Invocables;
+using Apps.Customer.io.Models.Response;
 using Apps.Customer.io.Models.Response.Content;
 using Apps.Customer.io.Models.Response.TransactionalMessage;
 using Apps.Customer.io.Utils.Converters;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
+using Newtonsoft.Json;
 using RestSharp;
+using System.Net.Mime;
+using System.Text;
 
 namespace Apps.Customer.io.Services;
 
 public class CampaignMessageService(InvocationContext invocationContext)
     : CustomerIoInvocable(invocationContext), IContentService
 {
-    public async Task<Stream> DownloadContentAsync(string contentId, string? language, string? actionId)
+    public async Task<Stream> DownloadContentAsync(string contentId, string? language, string? actionId, string fileFormat)
     {        
         if (string.IsNullOrEmpty(actionId))
         {
@@ -27,6 +31,22 @@ public class CampaignMessageService(InvocationContext invocationContext)
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithErrorHandling<CampaignMessageTranslationResponse>(request);
+
+        if (fileFormat == MediaTypeNames.Application.Json)
+        {
+            var wrappedContent = new JsonResponseWithMetadata
+            {
+                ContentId = response.Answer.CampaignId.ToString(),
+                ActionId = actionId,
+                ContentType = ContentTypes.CampaignMessage,
+                MessageId = response.Answer.Type,
+                Name = response.Answer.Name,
+                Body = JsonConvert.DeserializeObject(response.Answer.Body),
+            };
+            var json = JsonConvert.SerializeObject(wrappedContent, Formatting.Indented);
+            return new MemoryStream(Encoding.UTF8.GetBytes(json));
+        }
+
         return CampaignMessageConverter.ToHtmlStream(response, actionId);
     }
 
@@ -44,7 +64,7 @@ public class CampaignMessageService(InvocationContext invocationContext)
             .WithJsonBody(new
             {
                 name = campaignMessageEntity.Name,
-                body = campaignMessageEntity.Body,
+                body = campaignMessageEntity.Body.ToString(),
                 subject = campaignMessageEntity.Subject,
                 preheader_text = campaignMessageEntity.PreHeader
             }, JsonConfig.Settings);

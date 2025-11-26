@@ -8,6 +8,7 @@ using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using System.Net.Mime;
 
 namespace Apps.Customer.io.Actions.Content;
 
@@ -22,13 +23,15 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
     {
         var service = _contentServiceFactory.GetService(contentRequest.ContentType);
         var stream = await service.DownloadContentAsync(contentRequest.ContentId, contentRequest.Language,
-            contentRequest.ActionId);
+            contentRequest.ActionId, contentRequest.FileFormat);
+
+        var extension = contentRequest.FileFormat == MediaTypeNames.Text.Html ? "html" : "json";
 
         var fileName = string.IsNullOrEmpty(contentRequest.ActionId)
-            ? $"{contentRequest.ContentId}.html"
-            : $"{contentRequest.ContentId}_{contentRequest.ActionId}.html";
+            ? $"{contentRequest.ContentId}.{extension}"
+            : $"{contentRequest.ContentId}_{contentRequest.ActionId}.{extension}";
 
-        var fileReference = await fileManagementClient.UploadAsync(stream, "text/html", fileName);
+        var fileReference = await fileManagementClient.UploadAsync(stream, contentRequest.FileFormat ?? MediaTypeNames.Text.Html, fileName);
 
         return new()
         {

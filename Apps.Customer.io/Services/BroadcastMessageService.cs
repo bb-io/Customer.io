@@ -1,16 +1,20 @@
-﻿using System.Text;
+﻿using System.Net.Mime;
+using System.Text;
 using Apps.Customer.io.Api;
 using Apps.Customer.io.Constants;
 using Apps.Customer.io.Invocables;
 using Apps.Customer.io.Models.Entity;
 using Apps.Customer.io.Models.Request.Broadcast;
+using Apps.Customer.io.Models.Response;
 using Apps.Customer.io.Models.Response.Broadcast;
 using Apps.Customer.io.Models.Response.Content;
+using Apps.Customer.io.Utils;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace Apps.Customer.io.Services;
@@ -18,7 +22,7 @@ namespace Apps.Customer.io.Services;
 public class BroadcastMessageService(InvocationContext invocationContext)
     : CustomerIoInvocable(invocationContext), IContentService
 {
-    public async Task<Stream> DownloadContentAsync(string contentId, string? language, string? actionId)
+    public async Task<Stream> DownloadContentAsync(string contentId, string? language, string? actionId, string? fileFormat)
     {
         if (string.IsNullOrEmpty(actionId))
         {
@@ -31,6 +35,21 @@ public class BroadcastMessageService(InvocationContext invocationContext)
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithErrorHandling<BroadcastTranslationResponse>(request);
+
+        if (fileFormat == MediaTypeNames.Application.Json)
+        {
+            var wrappedContent = new JsonResponseWithMetadata
+            {
+                ContentId = contentId,
+                ActionId = actionId,
+                ContentType = ContentTypes.BroadcastMessage,
+                Name = response.Action.Name,
+                Body = response.Action.Body,
+            };
+            var json = JsonConvert.SerializeObject(wrappedContent, Formatting.Indented);
+            return new MemoryStream(Encoding.UTF8.GetBytes(json));
+        }
+
         var bodyHtml = response.Action.Body;
 
         var doc = new HtmlDocument();
@@ -53,7 +72,7 @@ public class BroadcastMessageService(InvocationContext invocationContext)
 
         InjectMetaTag(headNode, HtmlConstants.ContentId, contentId);
         InjectMetaTag(headNode, HtmlConstants.ActionId, actionId);
-        InjectMetaTag(headNode, HtmlConstants.ContentType, "newsletter");
+        InjectMetaTag(headNode, HtmlConstants.ContentType, ContentTypes.BroadcastMessage);
 
         var modifiedHtml = doc.DocumentNode.OuterHtml;
         return new MemoryStream(Encoding.UTF8.GetBytes(modifiedHtml));
@@ -63,6 +82,30 @@ public class BroadcastMessageService(InvocationContext invocationContext)
     {
         var bytes = await htmlStream.GetByteData();
         var htmlString = Encoding.Default.GetString(bytes);
+
+        if (htmlString.IsJson())
+        {
+            var content = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(htmlString);
+            if (content is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
+            var entity = await UpdateBroadcastTranslation(new BroadcastActionRequest()
+            {
+                BroadcastId = content.ContentId ?? throw new PluginApplicationException("Missing 'contentId' in the uploaded JSON."),
+                ActionId = content.ActionId ?? throw new PluginApplicationException("Missing 'actionId' in the uploaded JSON."),
+                Language = language
+            }, new()
+            {
+                Body = content.Body?.ToString()
+            });
+
+            return new()
+            {
+                ContentId = entity.BroadcastId,
+                Name = entity.Name,
+                ContentType = ContentTypes.BroadcastMessage,
+                CreatedAt = entity.Created ?? DateTime.MinValue,
+                UpdatedAt = entity.Updated ?? DateTime.MinValue
+            };
+        }
 
         var doc = new HtmlDocument();
         doc.LoadHtml(htmlString);
