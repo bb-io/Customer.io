@@ -1,5 +1,6 @@
 ﻿using Apps.Customer.io.Actions.Content;
 using Apps.Customer.io.Constants;
+using Apps.Customer.io.Models.Request.Campaign;
 using Apps.Customer.io.Models.Request.Content;
 using Apps.Customer.io.Models.Response;
 using Newtonsoft.Json;
@@ -70,8 +71,7 @@ public class ContentActionsTests : TestBase
         Assert.IsTrue(result.ContentType.Equals(ContentTypes.Newsletter));
         Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
     }
-    
-    
+        
     [TestMethod]
     public async Task DownloadContent_ValidCampaignMessageId_ShouldDownloadValidHtmlFile()
     {
@@ -162,5 +162,35 @@ public class ContentActionsTests : TestBase
         Assert.IsNotNull(uploadResult);
         Assert.IsTrue(uploadResult.ContentType.Equals(ContentTypes.CampaignMessage));
         Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+    }
+
+    [TestMethod]
+    public async Task SearchCampaigns_WithoutFilters_ShouldReturnCampaigns()
+    {
+        // Arrange
+        var action = new ContentActions(InvocationContext, FileManagementClient);
+        var input = new SearchCampaignsRequest { };
+
+        // Act
+        var result = await action.SearchCampaigns(input);
+
+        // Assert
+        Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public async Task SearchCampaigns_WithFilters_ShouldReturnCampaigns()
+    {
+        // Arrange
+        var action = new ContentActions(InvocationContext, FileManagementClient);
+        var input = new SearchCampaignsRequest { NameContains = "untitled", Tags = ["test 123", "test 345"] };
+
+        // Act
+        var result = await action.SearchCampaigns(input);
+
+        // Assert
+        Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+        Assert.IsNotNull(result);
     }
 }

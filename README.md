@@ -37,6 +37,7 @@ Before you can connect you need to make sure that:
 - **Update translation of a transactional message** Update the body and other data of a specific language variant for a transactional message
 - **Get a translation of a campaign message** Getting a translation of a campaign message
 - **Update a translation of a campaign message** Updating a translation of a campaign message
+- **Search campaigns** Search all campaigns in the workspace
 
 ### Unified
 - **Download Content**: Downloads content based on the specified ID. To use this action, you must specify the content type to which the content is assigned. Currently, all supported content types are: **Transactional Message, Broadcast Message, Campaign Message, and Newsletter**.
