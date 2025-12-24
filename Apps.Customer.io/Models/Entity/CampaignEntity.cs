@@ -18,6 +18,9 @@ public class CampaignEntity
     [Display("Creation date"), JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime Created { get; set; }
 
+    [Display("First started"), JsonConverter(typeof(UnixDateTimeConverter))]
+    public DateTime? FirstStarted { get; set; }
+
     [Display("Last updated"), JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime? Updated { get; set; }
 
