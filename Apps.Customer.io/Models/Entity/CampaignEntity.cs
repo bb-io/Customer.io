@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using Apps.Customer.io.Utils.Converters;
 using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Apps.Customer.io.Models.Entity;
 
@@ -18,11 +19,11 @@ public class CampaignEntity
     [Display("Creation date"), JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime Created { get; set; }
 
-    [Display("First started"), JsonConverter(typeof(UnixDateTimeConverter))]
-    public DateTime? FirstStarted { get; set; }
-
-    [Display("Last updated"), JsonConverter(typeof(UnixDateTimeConverter))]
+    [Display("Last updated"), JsonConverter(typeof(NullableUnixDateTimeConverter))]
     public DateTime? Updated { get; set; }
+
+    [Display("First started"), JsonConverter(typeof(NullableUnixDateTimeConverter))]
+    public DateTime? FirstStarted { get; set; }
 
     public bool Active { get; set; }
 
