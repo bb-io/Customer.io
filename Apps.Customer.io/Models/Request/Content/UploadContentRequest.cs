@@ -10,5 +10,8 @@ public class UploadContentRequest : ContentTypeRequest
     [Display("Action ID")]
     public string? ActionId { get; set; }
 
-    public string Language { get; set; } 
+    public string? Language { get; set; }
+
+    [Display("Update source")]
+    public bool? UpdateSource { get; set; }
 }
