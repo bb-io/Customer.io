@@ -11,6 +11,7 @@ using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
+using Blackbird.Applications.SDK.Blueprints.Interfaces.CMS;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using RestSharp;
 using System.Net.Mime;
@@ -47,9 +48,9 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
     [Action("Upload content", Description = "Update content from HTML file")]
     public async Task<ContentResponse> UploadContent([ActionParameter] UploadContentRequest uploadContentRequest)
     {
-        if (String.IsNullOrEmpty(uploadContentRequest.Language))
+        if (String.IsNullOrEmpty(uploadContentRequest.Language) && (!uploadContentRequest.UpdateSource.HasValue || uploadContentRequest.UpdateSource.Value == false))
         {
-            throw new PluginMisconfigurationException("Language input cannot be empty.");
+            throw new PluginMisconfigurationException("Language input cannot be empty, unless you want to update the source content. In that case, set Update source to true.");
         }
 
         var service = _contentServiceFactory.GetService(uploadContentRequest.ContentType);
