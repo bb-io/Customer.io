@@ -21,7 +21,7 @@ Before you can connect you need to make sure that:
 2. Click _Add Connection_.
 3. Name your connection for future reference e.g. 'My Customer.io connection'.
 4. Fill in the API key to the Customer.io instance you want to connect to.
-7. Click _Connect_.
+5. Click _Connect_.
 
 ![CustomerioBlackbirdConnection](image/README/CustomerioBlackbirdConnection.png)
 

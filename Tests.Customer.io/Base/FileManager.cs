@@ -8,7 +8,7 @@ public class FileManager(string folderLocation) : IFileManagementClient
 {
     public Task<Stream> DownloadAsync(FileReference reference)
     {
-        var path = Path.Combine(folderLocation, @$"Input\{reference.Name}");
+        var path = Path.Combine(folderLocation, Path.Combine("Input", reference.Name));
         var bytes = File.ReadAllBytes(path);
 
         var stream = new MemoryStream(bytes);
@@ -17,7 +17,7 @@ public class FileManager(string folderLocation) : IFileManagementClient
 
     public Task<FileReference> UploadAsync(Stream stream, string contentType, string fileName)
     {
-        var path = Path.Combine(folderLocation, @$"Output\{fileName}");
+        var path = Path.Combine(folderLocation, Path.Combine("Output", fileName));
         new FileInfo(path).Directory!.Create();
         using (var fileStream = File.Create(path))
         {
@@ -29,7 +29,7 @@ public class FileManager(string folderLocation) : IFileManagementClient
 
     public string ReadOutputAsString(FileReference reference)
     {
-        var path = Path.Combine(folderLocation, @$"Output\{reference.Name}");
+        var path = Path.Combine(folderLocation, Path.Combine("Output", reference.Name));
         Assert.IsTrue(File.Exists(path), $"File not found at: {path}");
         return File.ReadAllText(path, Encoding.UTF8)!;
     }
