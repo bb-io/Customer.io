@@ -14,7 +14,6 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using RestSharp;
 using System.Net.Mime;
-using System.Text;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Filters.Bilingual.Xliff2;
 using Blackbird.Filters.Transformations;
@@ -57,7 +56,7 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
         }
 
         var service = _contentServiceFactory.GetService(uploadContentRequest.ContentType);
-        var fileStream = await fileManagementClient.DownloadAsync(uploadContentRequest.File);
+        await using var fileStream = await fileManagementClient.DownloadAsync(uploadContentRequest.File);
         var bytes = await fileStream.GetByteData();
 
         Stream uploadStream;
