@@ -46,9 +46,13 @@ public class SnippetsActions(InvocationContext invocationContext, IFileManagemen
     [Action("Update snippet", Description = "Update the name or value of a snippet")]
     public async Task<SnippetEntity> UpdateSnippet([ActionParameter] UpdateSnippetRequest input)
     {
-        var request = new CustomerIoRequest("v1/snippets", Method.Put, Creds)
-            .WithJsonBody(input, JsonConfig.Settings);
-
+        var body = new
+        {
+            value = input.Value,
+            name = input.SnippetName
+        };
+        
+        var request = new CustomerIoRequest("v1/snippets", Method.Put, Creds).WithJsonBody(body);
         var response = await Client.ExecuteWithErrorHandling<SnippetResponse>(request);
         return response.Snippet;
     }
