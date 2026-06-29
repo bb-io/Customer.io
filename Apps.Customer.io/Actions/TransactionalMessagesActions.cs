@@ -63,7 +63,7 @@ public class TransactionalMessagesActions(InvocationContext invocationContext, I
         [ActionParameter] TransactionalMessageTranslationRequest input,
         [ActionParameter] FileRequest fileRequest)
     {
-        var fileStream = await fileManagementClient.DownloadAsync(fileRequest.File);
+        await using var fileStream = await fileManagementClient.DownloadAsync(fileRequest.File);
         var uploadStream = await FileTransformer.ToHtml(fileStream, fileRequest.File);
         
         var campaignMessageEntity = TransactionalMessageConverter.ToTransactionalMessageEntity(uploadStream);

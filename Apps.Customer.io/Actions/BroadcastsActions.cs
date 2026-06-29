@@ -71,8 +71,8 @@ public class BroadcastsActions(InvocationContext invocationContext, IFileManagem
         [ActionParameter] BroadcastActionRequest input,
         [ActionParameter] FileRequest updateRequest)
     {
-        var fileStream = await fileManagementClient.DownloadAsync(updateRequest.File);
-        var uploadStream = await FileTransformer.ToHtml(fileStream, updateRequest.File);
+        await using var fileStream = await fileManagementClient.DownloadAsync(updateRequest.File);
+        await using var uploadStream = await FileTransformer.ToHtml(fileStream, updateRequest.File);
         var bytes = await uploadStream.GetByteData();
         
         var body = System.Text.Encoding.Default.GetString(bytes);
