@@ -27,21 +27,41 @@ Before you can connect you need to make sure that:
 
 ## Actions
 
-- **Get translation of a broadcast message** Get information about a translation of message in a broadcast
-- **Get translation of a newsletter** Get information about a translation of an individual newsletter. Also includes file as HTML document in output
-- **Get translation of a transactional message** Get information about a translation of an individual transactional message
-- **List snippets** List all snippets in the workspace
-- **Update a translation of a broadcast message** Update a translation of a specific broadcast action
-- **Update snippet** Update the name or value of a snippet
-- **Update translation of a newsletter** Update the translation of a newsletter variant
-- **Update translation of a transactional message** Update the body and other data of a specific language variant for a transactional message
-- **Get a translation of a campaign message** Getting a translation of a campaign message
-- **Update a translation of a campaign message** Updating a translation of a campaign message
-- **Search campaigns** Search all campaigns in the workspace
+### Broadcasts
 
-### Unified
-- **Download Content**: Downloads content based on the specified ID. To use this action, you must specify the content type to which the content is assigned. Currently, all supported content types are: **Transactional Message, Broadcast Message, Campaign Message, and Newsletter**.
-- **Upload Content**: Uploads content based on the specified ID. This action is used in **pair with `Download Content`** to upload a translated file and update the translation for the specified language.
+- **Get broadcast message** Get information about a translation of message in a broadcast.
+- **Download broadcast message** Get broadcast message as HTML.
+- **Update broadcast message** Update a translation of a specific broadcast action.
+- **Upload broadcast message** Update a translation of a specific broadcast action.
+
+### Newsletters
+
+- **Get translation of newsletter** Get information about a translation of an individual newsletter.
+- **Update translation of newsletter** Update the translation of a newsletter variant.
+- **Get translation of campaign message** Get a translation of a campaign message.
+- **Download campaign message** Get a translation of a campaign message as HTML.
+- **Update translation of campaign message** Update a translation of a campaign message.
+- **Upload campaign message** Update a translation of a campaign message.
+
+### Transactional messages
+
+- **Get translation of a transactional message** Get information about a translation of an individual transactional message.
+- **Download transactional message** Get information about a translation of an individual transactional message.
+- **Update translation of a transactional message** Update the body and other data of a specific language variant for a transactional message.
+- **Upload transactional message** Update the body and other data of a specific language variant for a transactional message.
+
+### Snippets
+
+- **Search snippets** Returns all snippets in the workspace.
+- **Download snippet** Get a snippet as HTML file.
+- **Update snippet** Update the name or value of a snippet.
+- **Upload snippet** Update snippet's value from a file.
+
+### Content
+
+- **Download content** Download content in HTML format based on specified ID.
+- **Upload content** Update content from file.
+- **Search campaigns** Returns all campaigns in the workspace.
 
 ## Polling 
 
