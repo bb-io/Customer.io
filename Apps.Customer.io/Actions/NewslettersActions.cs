@@ -19,6 +19,7 @@ using Apps.Customer.io.DataSourceHandlers;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using System.Net.Mime;
+using Apps.Customer.io.Utils;
 
 namespace Apps.Customer.io.Actions;
 
@@ -67,7 +68,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         return response ?? new CampaignMessageTranslationResponse();
     }
 
-    [Action("Get translation of campaign message as HTML",
+    [Action("Download campaign message",
         Description = "Get a translation of a campaign message as HTML")]
     public async Task<FileResponse> GetTranslationOfCampaignMessageAsHtmlAsync(
         [ActionParameter] CampaignTranslationRequest input)
@@ -128,7 +129,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         return response;
     }
     
-    [Action("Update translation of campaign message from HTML", Description = "Update a translation of a campaign message")]
+    [Action("Upload campaign message", Description = "Update a translation of a campaign message")]
     public async Task<CampaignMessageTranslationResponse> UpdateCampaignTranslationFromHtmlAsync(
         [ActionParameter] CampaignTranslationRequest input,
         [ActionParameter] UpdateCampaignTranslationFromHtmlRequest updateRequest)
@@ -150,11 +151,9 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
         
         await using var htmlStream = await fileManagementClient.DownloadAsync(updateRequest.File);
-        var memoryStream = new MemoryStream();
-        await htmlStream.CopyToAsync(memoryStream);
-        memoryStream.Position = 0;
+        var uploadStream = await FileTransformer.ToHtml(htmlStream, updateRequest.File);
         
-        var campaignMessageEntity = CampaignMessageConverter.ToCampaignMessageEntity(memoryStream);
+        var campaignMessageEntity = CampaignMessageConverter.ToCampaignMessageEntity(uploadStream);
         var request = new CustomerIoRequest(endpoint, Method.Put, Creds)
             .WithJsonBody(new
             {
@@ -168,7 +167,7 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         return response;
     }
     
-        private async Task<NewsletterTranslationFileResponse> HandleNewsletterTranslation(
+    private async Task<NewsletterTranslationFileResponse> HandleNewsletterTranslation(
         NewsletterRequest input,
         Method method,
         UpdateNewsletterTranslationEntity? payload = null)

@@ -14,6 +14,7 @@ using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
 using System.Net.Mime;
+using Apps.Customer.io.Utils;
 
 namespace Apps.Customer.io.Actions;
 
@@ -30,7 +31,7 @@ public class TransactionalMessagesActions(InvocationContext invocationContext, I
         return response.Content;
     }
     
-    [Action("Get translation of a transactional message as HTML", Description = "Get information about a translation of an individual transactional message")]
+    [Action("Download transactional message", Description = "Get information about a translation of an individual transactional message")]
     public async Task<FileResponse> GetTransactionalMessageTranslationAsHtmlAsync([ActionParameter] TransactionalMessageTranslationRequest input)
     {
         var endpoint = $"v1/transactional/{input.TransactionalMessageId}/language/{input.Language}";
@@ -57,16 +58,15 @@ public class TransactionalMessagesActions(InvocationContext invocationContext, I
         return response.Content;
     }
     
-    [Action("Update translation of a transactional message from HTML", Description = "Update the body and other data of a specific language variant for a transactional message")]
-    public async Task<EmailTemplateEntity> UpdateTransactionalMessageTranslationFromHtml([ActionParameter] TransactionalMessageTranslationRequest input,
+    [Action("Upload transactional message", Description = "Update the body and other data of a specific language variant for a transactional message")]
+    public async Task<EmailTemplateEntity> UpdateTransactionalMessageTranslationFromHtml(
+        [ActionParameter] TransactionalMessageTranslationRequest input,
         [ActionParameter] FileRequest fileRequest)
     {
-        var fileStream = await fileManagementClient.DownloadAsync(fileRequest.File);
-        var memoryStream = new MemoryStream();
-        await fileStream.CopyToAsync(memoryStream);
-        memoryStream.Position = 0;
+        await using var fileStream = await fileManagementClient.DownloadAsync(fileRequest.File);
+        var uploadStream = await FileTransformer.ToHtml(fileStream, fileRequest.File);
         
-        var campaignMessageEntity = TransactionalMessageConverter.ToTransactionalMessageEntity(memoryStream);
+        var campaignMessageEntity = TransactionalMessageConverter.ToTransactionalMessageEntity(uploadStream);
         return await UpdateTransactionalMessageTranslation(input, new UpdateMessageTranslationRequest
         {
             Body = campaignMessageEntity.Body

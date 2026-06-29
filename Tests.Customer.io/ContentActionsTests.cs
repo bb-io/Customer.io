@@ -18,7 +18,7 @@ public class ContentActionsTests : TestBase
         var contentActions = new ContentActions(InvocationContext, FileManagementClient);
         var request = new ContentRequest
         {
-            ContentId = "2",
+            ContentId = "1",
             ContentType = ContentTypes.Newsletter,
         };
         

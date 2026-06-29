@@ -11,10 +11,10 @@ using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
-using Blackbird.Applications.SDK.Blueprints.Interfaces.CMS;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using RestSharp;
 using System.Net.Mime;
+using Apps.Customer.io.Utils;
 
 namespace Apps.Customer.io.Actions.Content;
 
@@ -45,7 +45,7 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
         };
     }
     
-    [Action("Upload content", Description = "Update content from HTML file")]
+    [Action("Upload content", Description = "Update content from file")]
     public async Task<ContentResponse> UploadContent([ActionParameter] UploadContentRequest uploadContentRequest)
     {
         if (String.IsNullOrEmpty(uploadContentRequest.Language) && (!uploadContentRequest.UpdateSource.HasValue || uploadContentRequest.UpdateSource.Value == false))
@@ -54,13 +54,10 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
         }
 
         var service = _contentServiceFactory.GetService(uploadContentRequest.ContentType);
-        var fileStream = await fileManagementClient.DownloadAsync(uploadContentRequest.File);
-        
-        var memoryStream = new MemoryStream();
-        await fileStream.CopyToAsync(memoryStream);
-        memoryStream.Position = 0;
-        
-        return await service.UploadContentAsync(memoryStream, uploadContentRequest.Language, uploadContentRequest.ActionId);
+        await using var fileStream = await fileManagementClient.DownloadAsync(uploadContentRequest.File);
+        var uploadStream = await FileTransformer.ToHtml(fileStream, uploadContentRequest.File);
+
+        return await service.UploadContentAsync(uploadStream, uploadContentRequest.Language, uploadContentRequest.ActionId);
     }
 
     [Action("Search campaigns", Description = "Returns all campaigns in the workspace")]

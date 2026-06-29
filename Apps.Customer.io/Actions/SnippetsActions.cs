@@ -27,7 +27,7 @@ public class SnippetsActions(InvocationContext invocationContext, IFileManagemen
         return Client.ExecuteWithErrorHandling<ListSnippetsResponse>(request);
     }
 
-    [Action("Get snippet as HTML", Description = "Get a snippet as HTML file")]
+    [Action("Download snippet", Description = "Get a snippet as HTML file")]
     public async Task<FileResponse> GetSnippetAsHtmlAsync([ActionParameter] SnippetRequest snippetRequest)
     {
         var snippets = await ListSnippets();
@@ -46,22 +46,24 @@ public class SnippetsActions(InvocationContext invocationContext, IFileManagemen
     [Action("Update snippet", Description = "Update the name or value of a snippet")]
     public async Task<SnippetEntity> UpdateSnippet([ActionParameter] UpdateSnippetRequest input)
     {
-        var request = new CustomerIoRequest("v1/snippets", Method.Put, Creds)
-            .WithJsonBody(input, JsonConfig.Settings);
-
+        var body = new
+        {
+            value = input.Value,
+            name = input.SnippetName
+        };
+        
+        var request = new CustomerIoRequest("v1/snippets", Method.Put, Creds).WithJsonBody(body);
         var response = await Client.ExecuteWithErrorHandling<SnippetResponse>(request);
         return response.Snippet;
     }
     
-    [Action("Update snippet from HTML", Description = "Update a snippet's value from an uploaded HTML file")]
+    [Action("Upload snippet", Description = "Update snippet's value from a file")]
     public async Task<SnippetEntity> UpdateSnippetFromHtmlAsync([ActionParameter] UpdateSnippetFromHtmlRequest updateSnippetRequest)
     {
         await using var htmlStream = await fileManagementClient.DownloadAsync(updateSnippetRequest.File);
-        var memoryStream = new MemoryStream();
-        await htmlStream.CopyToAsync(memoryStream);
-        memoryStream.Position = 0;
+        var uploadStream = await FileTransformer.ToHtml(htmlStream, updateSnippetRequest.File);
         
-        var snippetEntity = SnippetHtmlConverter.ToSnippetEntity(memoryStream);
+        var snippetEntity = SnippetHtmlConverter.ToSnippetEntity(uploadStream);
         return await UpdateSnippet(new()
         {
             SnippetName = updateSnippetRequest.SnippetName,

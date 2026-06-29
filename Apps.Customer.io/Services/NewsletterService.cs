@@ -22,7 +22,7 @@ namespace Apps.Customer.io.Services;
 public class NewsletterService(InvocationContext invocationContext)
     : CustomerIoInvocable(invocationContext), IContentService
 {
-    public async Task<Stream> DownloadContentAsync(string contentId, string? language, string? actionId, string fileFormat)
+    public async Task<Stream> DownloadContentAsync(string contentId, string? language, string? actionId, string? fileFormat)
     {
         var endpoint = $"v1/newsletters/{contentId}/language/{language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
@@ -67,20 +67,26 @@ public class NewsletterService(InvocationContext invocationContext)
             // Store pre-HTML content in a custom data attribute
             htmlNode.SetAttributeValue(HtmlConstants.PreHtmlContent, System.Net.WebUtility.HtmlEncode(preHtmlContent));
         }
-        
-        var headNode = HtmlNode.CreateNode("<head></head>");
-        headNode.AppendChild(HtmlNode.CreateNode("<meta charset='UTF-8'>"));
-        headNode.AppendChild(HtmlNode.CreateNode("<meta name='viewport' content='width=device-width, initial-scale=1.0'>"));
 
-        headNode.AppendChild(HtmlNode.CreateNode($"<meta name='{HtmlConstants.ContentId}' content='{System.Net.WebUtility.HtmlEncode(contentId)}'>"));
-        if(actionId != null)
-        {
-            headNode.AppendChild(HtmlNode.CreateNode($"<meta name='{HtmlConstants.ActionId}' content='{System.Net.WebUtility.HtmlEncode(actionId)}'>"));
-        }
+        var sourceHead = doc.DocumentNode.SelectSingleNode("//head");
+        var headNode = sourceHead != null ? sourceHead.Clone() : HtmlNode.CreateNode("<head></head>");
+
+        if (headNode.SelectSingleNode("meta[@charset] | meta[@http-equiv='Content-Type']") == null)
+            headNode.AppendChild(HtmlNode.CreateNode("<meta charset='UTF-8'>"));
         
-        headNode.AppendChild(HtmlNode.CreateNode($"<meta name='{HtmlConstants.ContentType}' content='{ContentTypes.Newsletter}'>"));
-        
-        headNode.AppendChild(HtmlNode.CreateNode($"<title>{System.Net.WebUtility.HtmlEncode(entity.Subject)}</title>"));
+        if (headNode.SelectSingleNode("meta[@name='viewport']") == null)
+            headNode.AppendChild(HtmlNode.CreateNode("<meta name='viewport' content='width=device-width, initial-scale=1.0'>"));
+
+        headNode.UpsertMeta(HtmlConstants.ContentId, contentId);
+        if (actionId != null)
+            headNode.UpsertMeta(HtmlConstants.ActionId, actionId);
+        headNode.UpsertMeta(HtmlConstants.ContentType, ContentTypes.Newsletter);
+
+        var titleNode = headNode.SelectSingleNode("title");
+        if (titleNode != null)
+            titleNode.InnerHtml = System.Net.WebUtility.HtmlEncode(entity.Subject);
+        else
+            headNode.AppendChild(HtmlNode.CreateNode($"<title>{System.Net.WebUtility.HtmlEncode(entity.Subject)}</title>"));
 
         var bodyNode = HtmlNode.CreateNode("<body></body>");
 
