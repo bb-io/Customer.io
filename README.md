@@ -41,7 +41,7 @@ Before you can connect you need to make sure that:
 
 ### Unified
 - **Download Content**: Downloads content based on the specified ID. To use this action, you must specify the content type to which the content is assigned. Currently, all supported content types are: **Transactional Message, Broadcast Message, Campaign Message, and Newsletter**.
-- **Upload Content**: Uploads content based on the specified ID. This action is used in **pair with `Download Content`** to upload a translated HTML file and update the translation for the specified language.
+- **Upload Content**: Uploads content based on the specified ID. This action is used in **pair with `Download Content`** to upload a translated file and update the translation for the specified language.
 
 ## Polling 
 
