@@ -48,7 +48,7 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
         };
     }
     
-    [Action("Upload content", Description = "Update content from HTML file")]
+    [Action("Upload content", Description = "Update content from file")]
     public async Task<ContentResponse> UploadContent([ActionParameter] UploadContentRequest uploadContentRequest)
     {
         if (String.IsNullOrEmpty(uploadContentRequest.Language) && (!uploadContentRequest.UpdateSource.HasValue || uploadContentRequest.UpdateSource.Value == false))
@@ -67,9 +67,11 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
             if (!loadResult.Success)
                 throw new PluginMisconfigurationException(loadResult.Error);
 
-            var html = loadResult.Value.Serialize()
-                       ?? throw new PluginMisconfigurationException("XLIFF did not contain files");
-            uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(html));
+            var targetLoadResult = loadResult.Value.Target();
+            if (!targetLoadResult.Success)
+                throw new PluginMisconfigurationException(targetLoadResult.Error);
+
+            uploadStream = targetLoadResult.Value.ToStream();
         }
         else
             uploadStream = new MemoryStream(bytes);
