@@ -11,10 +11,13 @@ using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
-using Blackbird.Applications.SDK.Blueprints.Interfaces.CMS;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using RestSharp;
 using System.Net.Mime;
+using System.Text;
+using Blackbird.Applications.Sdk.Utils.Extensions.Files;
+using Blackbird.Filters.Bilingual.Xliff2;
+using Blackbird.Filters.Transformations;
 
 namespace Apps.Customer.io.Actions.Content;
 
@@ -55,12 +58,23 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
 
         var service = _contentServiceFactory.GetService(uploadContentRequest.ContentType);
         var fileStream = await fileManagementClient.DownloadAsync(uploadContentRequest.File);
-        
-        var memoryStream = new MemoryStream();
-        await fileStream.CopyToAsync(memoryStream);
-        memoryStream.Position = 0;
-        
-        return await service.UploadContentAsync(memoryStream, uploadContentRequest.Language, uploadContentRequest.ActionId);
+        var bytes = await fileStream.GetByteData();
+
+        Stream uploadStream;
+        if (Xliff2Serializer.IsXliff2(new MemoryStream(bytes), out _))
+        {
+            var loadResult = Transformation.Load(new MemoryStream(bytes), uploadContentRequest.File.Name);
+            if (!loadResult.Success)
+                throw new PluginMisconfigurationException(loadResult.Error);
+
+            var html = loadResult.Value.Serialize()
+                       ?? throw new PluginMisconfigurationException("XLIFF did not contain files");
+            uploadStream = new MemoryStream(Encoding.UTF8.GetBytes(html));
+        }
+        else
+            uploadStream = new MemoryStream(bytes);
+
+        return await service.UploadContentAsync(uploadStream, uploadContentRequest.Language, uploadContentRequest.ActionId);
     }
 
     [Action("Search campaigns", Description = "Returns all campaigns in the workspace")]
