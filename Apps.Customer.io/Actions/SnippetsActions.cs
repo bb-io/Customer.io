@@ -27,7 +27,7 @@ public class SnippetsActions(InvocationContext invocationContext, IFileManagemen
         return Client.ExecuteWithErrorHandling<ListSnippetsResponse>(request);
     }
 
-    [Action("Get snippet as HTML", Description = "Get a snippet as HTML file")]
+    [Action("Download snippet", Description = "Get a snippet as HTML file")]
     public async Task<FileResponse> GetSnippetAsHtmlAsync([ActionParameter] SnippetRequest snippetRequest)
     {
         var snippets = await ListSnippets();
@@ -53,15 +53,13 @@ public class SnippetsActions(InvocationContext invocationContext, IFileManagemen
         return response.Snippet;
     }
     
-    [Action("Update snippet from HTML", Description = "Update a snippet's value from an uploaded HTML file")]
+    [Action("Upload snippet", Description = "Update snippet's value from a file")]
     public async Task<SnippetEntity> UpdateSnippetFromHtmlAsync([ActionParameter] UpdateSnippetFromHtmlRequest updateSnippetRequest)
     {
         await using var htmlStream = await fileManagementClient.DownloadAsync(updateSnippetRequest.File);
-        var memoryStream = new MemoryStream();
-        await htmlStream.CopyToAsync(memoryStream);
-        memoryStream.Position = 0;
+        var uploadStream = await FileTransformer.ToHtml(htmlStream, updateSnippetRequest.File);
         
-        var snippetEntity = SnippetHtmlConverter.ToSnippetEntity(memoryStream);
+        var snippetEntity = SnippetHtmlConverter.ToSnippetEntity(uploadStream);
         return await UpdateSnippet(new()
         {
             SnippetName = updateSnippetRequest.SnippetName,

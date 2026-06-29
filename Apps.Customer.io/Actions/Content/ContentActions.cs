@@ -14,9 +14,7 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using RestSharp;
 using System.Net.Mime;
-using Blackbird.Applications.Sdk.Utils.Extensions.Files;
-using Blackbird.Filters.Bilingual.Xliff2;
-using Blackbird.Filters.Transformations;
+using Apps.Customer.io.Utils;
 
 namespace Apps.Customer.io.Actions.Content;
 
@@ -57,23 +55,7 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
 
         var service = _contentServiceFactory.GetService(uploadContentRequest.ContentType);
         await using var fileStream = await fileManagementClient.DownloadAsync(uploadContentRequest.File);
-        var bytes = await fileStream.GetByteData();
-
-        Stream uploadStream;
-        if (Xliff2Serializer.IsXliff2(new MemoryStream(bytes), out _))
-        {
-            var loadResult = Transformation.Load(new MemoryStream(bytes), uploadContentRequest.File.Name);
-            if (!loadResult.Success)
-                throw new PluginMisconfigurationException(loadResult.Error);
-
-            var targetLoadResult = loadResult.Value.Target();
-            if (!targetLoadResult.Success)
-                throw new PluginMisconfigurationException(targetLoadResult.Error);
-
-            uploadStream = targetLoadResult.Value.ToStream();
-        }
-        else
-            uploadStream = new MemoryStream(bytes);
+        var uploadStream = await FileTransformer.ToHtml(fileStream, uploadContentRequest.File);
 
         return await service.UploadContentAsync(uploadStream, uploadContentRequest.Language, uploadContentRequest.ActionId);
     }

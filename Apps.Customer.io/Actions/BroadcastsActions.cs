@@ -13,6 +13,7 @@ using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using RestSharp;
 using System.Net.Mime;
+using Apps.Customer.io.Utils;
 
 namespace Apps.Customer.io.Actions;
 
@@ -30,7 +31,7 @@ public class BroadcastsActions(InvocationContext invocationContext, IFileManagem
         return response.Action;
     }
     
-    [Action("Get broadcast message as HTML", Description = "Get broadcast message as HTML")]
+    [Action("Download broadcast message", Description = "Get broadcast message as HTML")]
     public async Task<FileResponse> GetBroadcastMessageAsHtmlAsync([ActionParameter] BroadcastActionRequest input)
     {
         var endpoint = $"v1/broadcasts/{input.BroadcastId}/actions/{input.ActionId}/language/{input.Language}";
@@ -64,13 +65,16 @@ public class BroadcastsActions(InvocationContext invocationContext, IFileManagem
         return response.Action;
     }
     
-    [Action("Update broadcast message from HTML",
-        Description = "Update a translation of a specific broadcast action from HTML file")]
-    public async Task<BroadcastActionEntity> UpdateBroadcastActionFromHtmlAsync([ActionParameter] BroadcastActionRequest input,
+    [Action("Upload broadcast message",
+        Description = "Update a translation of a specific broadcast action")]
+    public async Task<BroadcastActionEntity> UpdateBroadcastActionFromHtmlAsync(
+        [ActionParameter] BroadcastActionRequest input,
         [ActionParameter] FileRequest updateRequest)
     {
         var fileStream = await fileManagementClient.DownloadAsync(updateRequest.File);
-        var bytes = await fileStream.GetByteData();
+        var uploadStream = await FileTransformer.ToHtml(fileStream, updateRequest.File);
+        var bytes = await uploadStream.GetByteData();
+        
         var body = System.Text.Encoding.Default.GetString(bytes);
         return await UpdateBroadcastTranslation(input, new()
         {
