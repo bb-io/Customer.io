@@ -5,6 +5,7 @@ using Apps.Customer.io.Constants;
 using Apps.Customer.io.Invocables;
 using Apps.Customer.io.Models.Entity;
 using Apps.Customer.io.Models.Request.Broadcast;
+using Apps.Customer.io.Models.Request.Content;
 using Apps.Customer.io.Models.Response;
 using Apps.Customer.io.Models.Response.Broadcast;
 using Apps.Customer.io.Models.Response.Content;
@@ -22,21 +23,24 @@ namespace Apps.Customer.io.Services;
 public class BroadcastMessageService(InvocationContext invocationContext)
     : CustomerIoInvocable(invocationContext), IContentService
 {
-    public async Task<Stream> DownloadContentAsync(string contentId, string? language, string? actionId, string? fileFormat)
+    public async Task<Stream> DownloadContentAsync(ContentRequest downloadInput)
     {
-        if (string.IsNullOrEmpty(actionId))
+        if (string.IsNullOrEmpty(downloadInput.ActionId))
         {
             throw new PluginMisconfigurationException(
                 "'Action ID' is null or empty, but it is a required input for the 'Broadcast message' content type. " +
                 "Please provide an 'Action ID' for this action.");
         }
 
-        var endpoint = $"v1/broadcasts/{contentId}/actions/{actionId}/language/{language}";
+        string contentId = downloadInput.ContentId;
+        string actionId = downloadInput.ActionId;
+        
+        var endpoint = $"v1/broadcasts/{contentId}/actions/{actionId}/language/{downloadInput.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithErrorHandling<BroadcastTranslationResponse>(request);
 
-        if (fileFormat == MediaTypeNames.Application.Json)
+        if (downloadInput.FileFormat == MediaTypeNames.Application.Json)
         {
             var wrappedContent = new JsonResponseWithMetadata
             {

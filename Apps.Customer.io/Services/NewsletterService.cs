@@ -2,7 +2,6 @@
 using Apps.Customer.io.Constants;
 using Apps.Customer.io.Invocables;
 using Apps.Customer.io.Models.Entity;
-using Apps.Customer.io.Models.Request.Broadcast;
 using Apps.Customer.io.Models.Response;
 using Apps.Customer.io.Models.Response.Content;
 using Apps.Customer.io.Models.Response.Newsletter;
@@ -13,98 +12,34 @@ using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using RestSharp;
-using System.Net.Mime;
 using System.Text;
-using System.Text.RegularExpressions;
+using Apps.Customer.io.Models.Entity.Content;
+using Apps.Customer.io.Models.Request.Content;
+using Apps.Customer.io.Utils.Converters;
 
 namespace Apps.Customer.io.Services;
 
 public class NewsletterService(InvocationContext invocationContext)
     : CustomerIoInvocable(invocationContext), IContentService
 {
-    public async Task<Stream> DownloadContentAsync(string contentId, string? language, string? actionId, string? fileFormat)
+    public async Task<Stream> DownloadContentAsync(ContentRequest downloadInput)
     {
-        var endpoint = $"v1/newsletters/{contentId}/language/{language}";
+        if (string.IsNullOrWhiteSpace(downloadInput.Language))
+            throw new PluginMisconfigurationException("Language is required for Newsletters");
+
+        string endpoint = $"v1/newsletters/{downloadInput.ContentId}/language/{downloadInput.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
 
-        if (fileFormat == MediaTypeNames.Application.Json)
-        {
-            var wrappedContent = new JsonResponseWithMetadata
-            {
-                ContentId = contentId,
-                ActionId = actionId,
-                ContentType = ContentTypes.Newsletter,
-                Name = response.Content.Name,
-                Body = response.Content.Body,
-            };
-            var json = JsonConvert.SerializeObject(wrappedContent, Formatting.Indented);
-            return new MemoryStream(Encoding.UTF8.GetBytes(json));
-        }
-
         var entity = response.Content;
-        var responseContent = response.Content.Body;
-        
-        // Extract any content before the <!doctype html> or <html tag
-        string? preHtmlContent = null;
-        var htmlStartMatch = Regex.Match(responseContent, @"(?i)(<(!doctype\s+html|html))");
-        if (htmlStartMatch.Success && htmlStartMatch.Index > 0)
+
+        return ContentConverter.Serialize(downloadInput, new ContentDocument
         {
-            preHtmlContent = responseContent.Substring(0, htmlStartMatch.Index).Trim();
-        }
-
-        var doc = new HtmlDocument();
-        doc.LoadHtml(entity.Body);
-
-        var innerBody = doc.DocumentNode.SelectSingleNode("//body");
-        var finalBodyContent = innerBody != null ? innerBody.InnerHtml : entity.Body;
-
-        var finalDoc = new HtmlDocument();
-
-        var htmlNode = HtmlNode.CreateNode($"<html lang='{language ?? "en"}'></html>");
-        if (!string.IsNullOrEmpty(preHtmlContent))
-        {
-            // Store pre-HTML content in a custom data attribute
-            htmlNode.SetAttributeValue(HtmlConstants.PreHtmlContent, System.Net.WebUtility.HtmlEncode(preHtmlContent));
-        }
-
-        var sourceHead = doc.DocumentNode.SelectSingleNode("//head");
-        var headNode = sourceHead != null ? sourceHead.Clone() : HtmlNode.CreateNode("<head></head>");
-
-        if (headNode.SelectSingleNode("meta[@charset] | meta[@http-equiv='Content-Type']") == null)
-            headNode.AppendChild(HtmlNode.CreateNode("<meta charset='UTF-8'>"));
-        
-        if (headNode.SelectSingleNode("meta[@name='viewport']") == null)
-            headNode.AppendChild(HtmlNode.CreateNode("<meta name='viewport' content='width=device-width, initial-scale=1.0'>"));
-
-        headNode.UpsertMeta(HtmlConstants.ContentId, contentId);
-        if (actionId != null)
-            headNode.UpsertMeta(HtmlConstants.ActionId, actionId);
-        headNode.UpsertMeta(HtmlConstants.ContentType, ContentTypes.Newsletter);
-
-        var titleNode = headNode.SelectSingleNode("title");
-        if (titleNode != null)
-            titleNode.InnerHtml = System.Net.WebUtility.HtmlEncode(entity.Subject);
-        else
-            headNode.AppendChild(HtmlNode.CreateNode($"<title>{System.Net.WebUtility.HtmlEncode(entity.Subject)}</title>"));
-
-        var bodyNode = HtmlNode.CreateNode("<body></body>");
-
-        var subjectNode = HtmlNode.CreateNode($"<div id='subject'>{System.Net.WebUtility.HtmlEncode(entity.Subject)}</div>");
-        var preHeaderNode = HtmlNode.CreateNode($"<div id='preheader'>{System.Net.WebUtility.HtmlEncode(entity.PreheaderText)}</div>");
-
-        bodyNode.AppendChild(subjectNode);
-        bodyNode.AppendChild(preHeaderNode);
-
-        var contentNode = HtmlNode.CreateNode($"<div id='content'>{finalBodyContent}</div>");
-        bodyNode.AppendChild(contentNode);
-
-        htmlNode.AppendChild(headNode);
-        htmlNode.AppendChild(bodyNode);
-        finalDoc.DocumentNode.AppendChild(htmlNode);
-
-        var htmlString = finalDoc.DocumentNode.OuterHtml;
-        return new MemoryStream(Encoding.UTF8.GetBytes(htmlString));
+            Name = entity.Name,
+            Subject = entity.Subject,
+            PreheaderText = entity.PreheaderText,
+            Body = entity.Body
+        });
     }
 
     public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, string? language, string? actionId)

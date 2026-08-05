@@ -13,20 +13,24 @@ using Newtonsoft.Json;
 using RestSharp;
 using System.Net.Mime;
 using System.Text;
+using Apps.Customer.io.Models.Request.Content;
 
 namespace Apps.Customer.io.Services;
 
 public class TransactionalMessageService(InvocationContext invocationContext)
     : CustomerIoInvocable(invocationContext), IContentService
 {
-    public async Task<Stream> DownloadContentAsync(string contentId, string? language, string? actionId, string fileFormat)
-    {        
-        var endpoint = $"v1/transactional/{contentId}/language/{language}";
+    public async Task<Stream> DownloadContentAsync(ContentRequest downloadInput)
+    {
+        string contentId = downloadInput.ContentId;
+        string? actionId = downloadInput.ActionId;
+        
+        var endpoint = $"v1/transactional/{contentId}/language/{downloadInput.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
 
         var response = await Client.ExecuteWithErrorHandling<ListMessageTranslationResponse>(request);
 
-        if (fileFormat == MediaTypeNames.Application.Json)
+        if (downloadInput.FileFormat == MediaTypeNames.Application.Json)
         {
             var wrappedContent = new JsonResponseWithMetadata
             {
