@@ -1,4 +1,5 @@
 ﻿using Apps.Customer.io.DataSourceHandlers;
+using Apps.Customer.io.Models.Request.Content;
 using Apps.Customer.io.Models.Request.Newsletter;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Tests.Customer.io.Base;
@@ -47,6 +48,37 @@ public class DataHandlerTests :TestBase
 
         // Act
         var result = await handler.GetDataAsync(new DataSourceContext { SearchString = "" }, CancellationToken.None);
+
+        // Assert
+        foreach (var item in result)
+            Console.WriteLine($"{item.DisplayName} - {item.Value}");
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public async Task ContentDataHandler_ReturnsValues()
+    {
+        // Arrange
+        var contentType = new ContentTypeRequest { ContentType = "newsletter" };
+        var handler = new ContentDataHandler(InvocationContext, contentType);
+
+        // Act
+        var result = await handler.GetDataAsync(new DataSourceContext { SearchString = "" }, CancellationToken.None);
+
+        // Assert
+        foreach (var item in result)
+            Console.WriteLine($"{item.DisplayName} - {item.Value}");
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public async Task DesignStudioEmailDataHandler_ReturnsValues()
+    {
+        // Arrange
+        var handler = new DesignStudioEmailDataHandler(InvocationContext);
+
+        // Act
+        var result = await handler.GetDataAsync(new DataSourceContext { SearchString = "Anton" }, CancellationToken.None);
 
         // Assert
         foreach (var item in result)

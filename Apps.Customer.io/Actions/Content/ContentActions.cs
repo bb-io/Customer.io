@@ -28,8 +28,7 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
     public async Task<FileResponse> DownloadContentAsync([ActionParameter] ContentRequest contentRequest)
     {
         var service = _contentServiceFactory.GetService(contentRequest.ContentType);
-        var stream = await service.DownloadContentAsync(contentRequest.ContentId, contentRequest.Language,
-            contentRequest.ActionId, contentRequest.FileFormat);
+        var stream = await service.DownloadContentAsync(contentRequest);
 
         var extension = contentRequest.FileFormat == MediaTypeNames.Application.Json ? "json" : "html";
 
