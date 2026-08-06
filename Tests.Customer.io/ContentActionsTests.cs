@@ -58,7 +58,7 @@ public class ContentActionsTests : TestBase
         {
             ContentId = "cdbf6db0-3400-4d38-8316-7277d0567d7b",
             ContentType = ContentTypes.DesignStudioEmail,
-            FileFormat = MediaTypeNames.Text.Html,
+            FileFormat = MediaTypeNames.Application.Json,
             Language = "en-US"
         };
 
@@ -66,6 +66,30 @@ public class ContentActionsTests : TestBase
 
         Assert.IsNotNull(result);
         Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+    }
+    
+    [TestMethod]
+    public async Task DownloadContent_ValidDesignStudioEmailId_ShouldDownloadValidJsonFile()
+    {
+        string contentId = "cdbf6db0-3400-4d38-8316-7277d0567d7b";
+        var contentActions = new ContentActions(InvocationContext, FileManagementClient);
+        var request = new ContentRequest
+        {
+            ContentId = contentId,
+            ContentType = ContentTypes.DesignStudioEmail,
+            FileFormat = MediaTypeNames.Application.Json,
+            Language = "en-US"
+        };
+
+        var result = await contentActions.DownloadContentAsync(request);
+        
+        Assert.IsNotNull(result);
+        Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+
+        string json = FileManagementClient.ReadOutputAsString(result.File);
+        Console.WriteLine(json);
+        var parsed = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(json);
+        Assert.AreEqual(contentId, parsed?.ContentId);
     }
 
     [TestMethod]

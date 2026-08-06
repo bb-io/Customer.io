@@ -53,8 +53,8 @@ public class NewsletterService(InvocationContext invocationContext)
         {
             var content = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(htmlString);
             if (content is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
-            payload.Subject = content.Name?.ToString();
-            payload.PreheaderText = string.Empty;
+            payload.Subject = content.Subject ?? content.Name?.ToString();
+            payload.PreheaderText = content.PreheaderText;
             payload.Body = content.Body?.ToString();
             contentId = content.ContentId;
         } else
@@ -69,8 +69,8 @@ public class NewsletterService(InvocationContext invocationContext)
             var subjectNode = doc.DocumentNode.SelectSingleNode("//div[@id='subject']");
             var preHeaderNode = doc.DocumentNode.SelectSingleNode("//div[@id='preheader']");
 
-            payload.Subject = subjectNode?.InnerText.Trim();
-            payload.PreheaderText = preHeaderNode?.InnerText.Trim();
+            payload.Subject = subjectNode is null ? null : HtmlEntity.DeEntitize(subjectNode.InnerText)?.Trim();
+            payload.PreheaderText = preHeaderNode is null ? null : HtmlEntity.DeEntitize(preHeaderNode.InnerText)?.Trim();
 
             subjectNode?.Remove();
             preHeaderNode?.Remove();
