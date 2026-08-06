@@ -47,8 +47,8 @@ public class DesignStudioEmailService(InvocationContext context) : CustomerIoInv
         var fileContent = await new StreamReader(htmlStream, Encoding.UTF8).ReadToEndAsync();
         var (contentId, document) = fileContent.IsJson() ? ParseJson(fileContent) : ParseHtml(fileContent);
 
-        var endpoint = $"v1/design_studio/emails/{contentId}/languages/{language}";
-        var apiRequest = new CustomerIoRequest(endpoint, Method.Put, Creds)
+        string endpoint = $"v1/design_studio/emails/{contentId}/languages/{language}";
+        var updateRequest = new CustomerIoRequest(endpoint, Method.Put, Creds)
             .WithJsonBody(new
             {
                 content = new
@@ -59,7 +59,10 @@ public class DesignStudioEmailService(InvocationContext context) : CustomerIoInv
                 }
             });
 
-        var response = await Client.ExecuteWithErrorHandling<DesignStudioEmailTranslationResponse>(apiRequest);
+        await Client.ExecuteWithErrorHandling(updateRequest);
+
+        var getTranslationRequest = new CustomerIoRequest(endpoint, Method.Get, Creds);
+        var response = await Client.ExecuteWithErrorHandling<DesignStudioEmailTranslationResponse>(getTranslationRequest);
         var entity = response.EmailTranslation;
 
         return new ContentResponse

@@ -176,6 +176,27 @@ public class ContentActionsTests : TestBase
         Assert.IsTrue(result.ContentType.Equals(ContentTypes.CampaignMessage));
         Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
     }
+    
+    [TestMethod]
+    public async Task UploadContent_ValidDesignStudioEmailFile_IsSuccess()
+    {
+        var contentActions = new ContentActions(InvocationContext, FileManagementClient);
+        var request = new UploadContentRequest
+        {
+            File = new()
+            {
+                Name = "design_studio_eml.html",
+                ContentType = "text/html"
+            },
+            ContentType = ContentTypes.DesignStudioEmail,
+            Language = "uk-UA"
+        };
+
+        var result = await contentActions.UploadContent(request);
+        
+        Assert.IsNotNull(result);
+        Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+    }
 
     [TestMethod]
     public async Task UploadContent_FromDownloadJson()
