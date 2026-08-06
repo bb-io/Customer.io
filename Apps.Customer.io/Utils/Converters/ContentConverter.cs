@@ -19,8 +19,7 @@ public static class ContentConverter
         return request.FileFormat switch
         {
             MediaTypeNames.Application.Json => ToJsonStream(request, document),
-            MediaTypeNames.Text.Html => ToHtmlStream(request, document),
-            _ => throw new PluginMisconfigurationException($"This file format is not supported: '{request.FileFormat}'")
+            _ => ToHtmlStream(request, document),
         };
     }
 
