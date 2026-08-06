@@ -14,22 +14,18 @@ namespace Apps.Customer.io.Utils.Converters;
 
 public static class ContentConverter
 {
-    public static Stream Serialize(ContentRequest request, ContentDocument document, bool bodyIsJson = false)
+    public static Stream Serialize(ContentRequest request, ContentDocument document)
     {
         return request.FileFormat switch
         {
-            MediaTypeNames.Application.Json => ToJsonStream(request, document, bodyIsJson),
+            MediaTypeNames.Application.Json => ToJsonStream(request, document),
             MediaTypeNames.Text.Html => ToHtmlStream(request, document),
             _ => throw new PluginMisconfigurationException($"This file format is not supported: '{request.FileFormat}'")
         };
     }
 
-    public static Stream ToJsonStream(ContentRequest request, ContentDocument document, bool bodyIsJson = false)
+    public static Stream ToJsonStream(ContentRequest request, ContentDocument document)
     {
-        var body = bodyIsJson && !string.IsNullOrEmpty(document.Body)
-            ? JsonConvert.DeserializeObject(document.Body)
-            : document.Body;
-        
         var wrappedContent = new JsonResponseWithMetadata
         {
             ContentId = request.ContentId,
@@ -37,7 +33,9 @@ public static class ContentConverter
             ContentType = request.ContentType,
             MessageId = document.MessageId,
             Name = document.Name,
-            Body = body
+            Body = document.Body,
+            Subject = document.Subject,
+            PreheaderText = document.PreheaderText,
         };
 
         var json = JsonConvert.SerializeObject(wrappedContent, Formatting.Indented);
