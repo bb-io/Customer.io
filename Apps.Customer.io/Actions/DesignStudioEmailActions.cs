@@ -41,7 +41,7 @@ public class DesignStudioEmailActions(InvocationContext invocationContext, IFile
         return new() { File = fileReference };
     }
 
-    [Action("Update Design Studio email", Description = "Update a design studio email translation from a file")]
+    [Action("Upload design studio email", Description = "Update a design studio email translation from a file")]
     public async Task<ContentResponse> UpdateDesignStudioEmail([ActionParameter] UploadDesignStudioEmailRequest input)
     {
         await using var fileStream = await fileManagementClient.DownloadAsync(input.File);
