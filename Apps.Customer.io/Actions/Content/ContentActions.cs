@@ -56,7 +56,7 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
         await using var fileStream = await fileManagementClient.DownloadAsync(uploadContentRequest.File);
         var uploadStream = await FileTransformer.ToHtml(fileStream, uploadContentRequest.File);
 
-        return await service.UploadContentAsync(uploadStream, uploadContentRequest.Language, uploadContentRequest.ActionId);
+        return await service.UploadContentAsync(uploadStream, uploadContentRequest.ToUploadInput());
     }
 
     [Action("Search campaigns", Description = "Returns all campaigns in the workspace")]

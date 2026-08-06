@@ -14,6 +14,7 @@ using RestSharp;
 using System.Net.Mime;
 using System.Text;
 using Apps.Customer.io.Models.Request.Content;
+using Apps.Customer.io.Services.Models;
 
 namespace Apps.Customer.io.Services;
 
@@ -47,13 +48,13 @@ public class TransactionalMessageService(InvocationContext invocationContext)
         return TransactionalMessageConverter.ToHtmlStream(response.Content, contentId);
     }
 
-    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, string? language, string? actionId)
+    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, ContentUploadInput uploadInput)
     {        
         var campaignMessageEntity = TransactionalMessageConverter.ToTransactionalMessageEntity(htmlStream);
         var response = await UpdateTransactionalMessageTranslation(new()
         {
             TransactionalMessageId = campaignMessageEntity.Id,
-            Language = language
+            Language = uploadInput.Language
         }, new()
         {
             Body = campaignMessageEntity.Body

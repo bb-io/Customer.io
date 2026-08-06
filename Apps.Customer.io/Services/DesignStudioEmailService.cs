@@ -7,6 +7,7 @@ using Apps.Customer.io.Models.Request.Content;
 using Apps.Customer.io.Models.Response;
 using Apps.Customer.io.Models.Response.Content;
 using Apps.Customer.io.Models.Response.DesignStudio;
+using Apps.Customer.io.Services.Models;
 using Apps.Customer.io.Utils;
 using Apps.Customer.io.Utils.Converters;
 using Blackbird.Applications.Sdk.Common.Exceptions;
@@ -39,15 +40,20 @@ public class DesignStudioEmailService(InvocationContext context) : CustomerIoInv
         });
     }
 
-    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, string? language, string? actionId)
+    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, ContentUploadInput uploadInput)
     {
-        if (string.IsNullOrWhiteSpace(language))
+        if (string.IsNullOrWhiteSpace(uploadInput.Language))
             throw new PluginMisconfigurationException("Language is required for Design Studio emails");
 
         var fileContent = await new StreamReader(htmlStream, Encoding.UTF8).ReadToEndAsync();
-        var (contentId, document) = fileContent.IsJson() ? ParseJson(fileContent) : ParseHtml(fileContent);
-
-        string endpoint = $"v1/design_studio/emails/{contentId}/languages/{language}";
+        var (fileContentId, document) = fileContent.IsJson() ? ParseJson(fileContent) : ParseHtml(fileContent);
+        
+        string contentId = 
+            uploadInput.ContentId ?? 
+            fileContentId ?? 
+            throw new PluginMisconfigurationException(ExceptionMessages.CouldntFindContentIdInHtml);
+        
+        string endpoint = $"v1/design_studio/emails/{contentId}/languages/{uploadInput.Language}";
         var updateRequest = new CustomerIoRequest(endpoint, Method.Put, Creds)
             .WithJsonBody(new
             {
@@ -67,7 +73,7 @@ public class DesignStudioEmailService(InvocationContext context) : CustomerIoInv
 
         return new ContentResponse
         {
-            ContentId = contentId,
+            ContentId = fileContentId,
             Name = entity.Content.Subject,
             ContentType = ContentTypes.DesignStudioEmail,
             CreatedAt = DateTimeOffset.FromUnixTimeSeconds(entity.Created).UtcDateTime,

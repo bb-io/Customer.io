@@ -9,6 +9,7 @@ using Apps.Customer.io.Models.Request.Content;
 using Apps.Customer.io.Models.Response;
 using Apps.Customer.io.Models.Response.Broadcast;
 using Apps.Customer.io.Models.Response.Content;
+using Apps.Customer.io.Services.Models;
 using Apps.Customer.io.Utils;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
@@ -82,10 +83,12 @@ public class BroadcastMessageService(InvocationContext invocationContext)
         return new MemoryStream(Encoding.UTF8.GetBytes(modifiedHtml));
     }
 
-    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, string? language, string? actionId)
+    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, ContentUploadInput uploadInput)
     {
         var bytes = await htmlStream.GetByteData();
         var htmlString = Encoding.Default.GetString(bytes);
+
+        string? language = uploadInput.Language;
 
         if (htmlString.IsJson())
         {
@@ -119,7 +122,7 @@ public class BroadcastMessageService(InvocationContext invocationContext)
 
         var actualContentId = contentIdNode?.GetAttributeValue("content", null) ??
             throw new PluginApplicationException(ExceptionMessages.CouldntFindContentIdInHtml);
-        var actualActionId = actionId ?? actionIdNode?.GetAttributeValue("content", null);
+        var actualActionId = uploadInput.ActionId ?? actionIdNode?.GetAttributeValue("content", null);
 
         if (string.IsNullOrEmpty(actualActionId))
         {

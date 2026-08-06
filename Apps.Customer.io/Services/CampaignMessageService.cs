@@ -13,6 +13,7 @@ using RestSharp;
 using System.Net.Mime;
 using System.Text;
 using Apps.Customer.io.Models.Request.Content;
+using Apps.Customer.io.Services.Models;
 
 namespace Apps.Customer.io.Services;
 
@@ -54,8 +55,10 @@ public class CampaignMessageService(InvocationContext invocationContext)
         return CampaignMessageConverter.ToHtmlStream(response, actionId);
     }
 
-    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, string? language, string? actionId)
-    {         
+    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, ContentUploadInput uploadInput)
+    {
+        string? actionId = uploadInput.ActionId;
+        
         var campaignMessageEntity = CampaignMessageConverter.ToCampaignMessageEntity(htmlStream);
         var actualActionId = string.IsNullOrEmpty(actionId) ? campaignMessageEntity.ActionId : actionId;
         if(string.IsNullOrEmpty(actualActionId))
@@ -63,7 +66,7 @@ public class CampaignMessageService(InvocationContext invocationContext)
             throw new PluginMisconfigurationException(ExceptionMessages.CouldntFindActionIdInHtml);
         }
 
-        var endpoint = $"v1/campaigns/{campaignMessageEntity.Id}/actions/{actualActionId}/language/{language}";
+        var endpoint = $"v1/campaigns/{campaignMessageEntity.Id}/actions/{actualActionId}/language/{uploadInput.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Put, Creds)
             .WithJsonBody(new
             {

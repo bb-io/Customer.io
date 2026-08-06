@@ -15,6 +15,7 @@ using RestSharp;
 using System.Text;
 using Apps.Customer.io.Models.Entity.Content;
 using Apps.Customer.io.Models.Request.Content;
+using Apps.Customer.io.Services.Models;
 using Apps.Customer.io.Utils.Converters;
 
 namespace Apps.Customer.io.Services;
@@ -42,7 +43,7 @@ public class NewsletterService(InvocationContext invocationContext)
         });
     }
 
-    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, string? language, string? actionId)
+    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, ContentUploadInput uploadInput)
     {
         var htmlString = await new StreamReader(htmlStream, Encoding.UTF8).ReadToEndAsync();
 
@@ -95,7 +96,7 @@ public class NewsletterService(InvocationContext invocationContext)
             payload.Body = finalHtml;
         }        
         
-        var endpoint = $"v1/newsletters/{contentId}/language/{language}";
+        var endpoint = $"v1/newsletters/{contentId}/language/{uploadInput.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Put, Creds)
             .WithJsonBody(payload, JsonConfig.Settings);
         
