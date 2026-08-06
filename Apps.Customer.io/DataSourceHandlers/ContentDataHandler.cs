@@ -1,4 +1,5 @@
-﻿using Apps.Customer.io.Invocables;
+﻿using Apps.Customer.io.Constants;
+using Apps.Customer.io.Invocables;
 using Apps.Customer.io.Models.Request.Content;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
@@ -28,6 +29,7 @@ public class ContentDataHandler(InvocationContext invocationContext, [ActionPara
             "broadcast_message" => new BroadcastDataHandler(InvocationContext),
             "campaign_message" => new CampaignDataHandler(InvocationContext),
             "transactional_message" => new TransactionalMessageDataHandler(InvocationContext),
+            ContentTypes.DesignStudioEmail => new DesignStudioEmailDataHandler(InvocationContext),
             _ => throw new Exception($"Couldn't find data handler for given content type: {contentType}")
         };
     }

@@ -28,8 +28,7 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
     public async Task<FileResponse> DownloadContentAsync([ActionParameter] ContentRequest contentRequest)
     {
         var service = _contentServiceFactory.GetService(contentRequest.ContentType);
-        var stream = await service.DownloadContentAsync(contentRequest.ContentId, contentRequest.Language,
-            contentRequest.ActionId, contentRequest.FileFormat);
+        var stream = await service.DownloadContentAsync(contentRequest);
 
         var extension = contentRequest.FileFormat == MediaTypeNames.Application.Json ? "json" : "html";
 
@@ -57,7 +56,7 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
         await using var fileStream = await fileManagementClient.DownloadAsync(uploadContentRequest.File);
         var uploadStream = await FileTransformer.ToHtml(fileStream, uploadContentRequest.File);
 
-        return await service.UploadContentAsync(uploadStream, uploadContentRequest.Language, uploadContentRequest.ActionId);
+        return await service.UploadContentAsync(uploadStream, uploadContentRequest.ToUploadInput());
     }
 
     [Action("Search campaigns", Description = "Returns all campaigns in the workspace")]

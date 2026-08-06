@@ -49,6 +49,48 @@ public class ContentActionsTests : TestBase
         var parsed = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(json);
         Assert.AreEqual("2", parsed.ContentId);
     }
+    
+    [TestMethod]
+    public async Task DownloadContent_ValidDesignStudioEmailId_ShouldDownloadValidHtmlFile()
+    {
+        var contentActions = new ContentActions(InvocationContext, FileManagementClient);
+        var request = new ContentRequest
+        {
+            ContentId = "cdbf6db0-3400-4d38-8316-7277d0567d7b",
+            ContentType = ContentTypes.DesignStudioEmail,
+            FileFormat = MediaTypeNames.Application.Json,
+            Language = "en-US"
+        };
+
+        var result = await contentActions.DownloadContentAsync(request);
+
+        Assert.IsNotNull(result);
+        Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+    }
+    
+    [TestMethod]
+    public async Task DownloadContent_ValidDesignStudioEmailId_ShouldDownloadValidJsonFile()
+    {
+        string contentId = "cdbf6db0-3400-4d38-8316-7277d0567d7b";
+        var contentActions = new ContentActions(InvocationContext, FileManagementClient);
+        var request = new ContentRequest
+        {
+            ContentId = contentId,
+            ContentType = ContentTypes.DesignStudioEmail,
+            FileFormat = MediaTypeNames.Application.Json,
+            Language = "en-US"
+        };
+
+        var result = await contentActions.DownloadContentAsync(request);
+        
+        Assert.IsNotNull(result);
+        Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+
+        string json = FileManagementClient.ReadOutputAsString(result.File);
+        Console.WriteLine(json);
+        var parsed = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(json);
+        Assert.AreEqual(contentId, parsed?.ContentId);
+    }
 
     [TestMethod]
     public async Task UploadContent_ValidNewsletterFile_ShouldDownloadValidHtmlFile()
@@ -132,6 +174,27 @@ public class ContentActionsTests : TestBase
         
         Assert.IsNotNull(result);
         Assert.IsTrue(result.ContentType.Equals(ContentTypes.CampaignMessage));
+        Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+    }
+    
+    [TestMethod]
+    public async Task UploadContent_ValidDesignStudioEmailFile_IsSuccess()
+    {
+        var contentActions = new ContentActions(InvocationContext, FileManagementClient);
+        var request = new UploadContentRequest
+        {
+            File = new()
+            {
+                Name = "design_studio_eml.html",
+                ContentType = "text/html"
+            },
+            ContentType = ContentTypes.DesignStudioEmail,
+            Language = "uk-UA"
+        };
+
+        var result = await contentActions.UploadContent(request);
+        
+        Assert.IsNotNull(result);
         Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
     }
 

@@ -12,6 +12,7 @@ public class ContentServiceFactory(InvocationContext invocationContext)
             "campaign_message" => new CampaignMessageService(invocationContext),
             "broadcast_message" => new BroadcastMessageService(invocationContext),
             "transactional_message" => new TransactionalMessageService(invocationContext),
+            "design_studio_email" => new DesignStudioEmailService(invocationContext),
             _ => throw new Exception($"Couldn't find content type service for given content type: {contentType}")
         };
     }

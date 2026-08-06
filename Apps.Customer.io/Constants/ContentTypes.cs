@@ -9,4 +9,6 @@ public static class ContentTypes
     public static readonly string TransactionalMessage = "transactional_message";
     
     public static readonly string Newsletter = "newsletter";
+    
+    public const string DesignStudioEmail = "design_studio_email";
 }

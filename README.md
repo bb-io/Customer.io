@@ -57,13 +57,18 @@ Before you can connect you need to make sure that:
 - **Update snippet** Update the name or value of a snippet.
 - **Upload snippet** Update snippet's value from a file.
 
+### Design studio emails
+
+- **Download design studio email** Download a design studio email translation.
+- **Upload design studio email** Update a design studio email translation from a file.
+
 ### Content
 
 - **Download content** Download content in HTML format based on specified ID.
 - **Upload content** Update content from file.
 - **Search campaigns** Returns all campaigns in the workspace.
 
-## Polling 
+## Events
 
 - **On broadcast created or updated** Triggered when a new broadcast was created or updated
 - **On newsletter created or updated** Triggered when a newsletter is created or updated

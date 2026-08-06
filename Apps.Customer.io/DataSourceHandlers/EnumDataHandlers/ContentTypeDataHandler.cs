@@ -12,6 +12,7 @@ public class ContentTypeDataHandler : IStaticDataSourceItemHandler
         { ContentTypes.BroadcastMessage, "Broadcast message" },
         { ContentTypes.CampaignMessage, "Campaign message" },
         { ContentTypes.Newsletter, "Newsletter" },
+        { ContentTypes.DesignStudioEmail, "Design studio email" },
     };
 
     public IEnumerable<DataSourceItem> GetData()
