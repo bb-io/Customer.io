@@ -1,4 +1,5 @@
-﻿using Apps.Customer.io.DataSourceHandlers;
+﻿using Apps.Customer.io.Constants;
+using Apps.Customer.io.DataSourceHandlers;
 using Apps.Customer.io.Models.Request.Content;
 using Apps.Customer.io.Models.Request.Newsletter;
 using Blackbird.Applications.Sdk.Common.Dynamic;
@@ -59,7 +60,7 @@ public class DataHandlerTests :TestBase
     public async Task ContentDataHandler_ReturnsValues()
     {
         // Arrange
-        var contentType = new ContentTypeRequest { ContentType = "newsletter" };
+        var contentType = new ContentTypeRequest { ContentType = ContentTypes.DesignStudioEmail };
         var handler = new ContentDataHandler(InvocationContext, contentType);
 
         // Act

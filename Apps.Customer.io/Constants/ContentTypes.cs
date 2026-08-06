@@ -10,5 +10,5 @@ public static class ContentTypes
     
     public static readonly string Newsletter = "newsletter";
     
-    public static readonly string DesignStudioEmail = "design_studio_email";
+    public const string DesignStudioEmail = "design_studio_email";
 }
