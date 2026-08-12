@@ -4,6 +4,7 @@ using Apps.Customer.io.Models.Request.Newsletter;
 using Apps.Customer.io.Models.Response.Campaigns;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using RestSharp;
 
@@ -19,7 +20,7 @@ public class CampaignActionDataHandler(
     {
         if (string.IsNullOrWhiteSpace(campaignTranslationRequest.CampaignId))
         {
-            throw new("Please, provide 'Campaign ID' input first");
+            throw new PluginMisconfigurationException("Please, provide 'Campaign ID' input first");
         }
 
         var request = new CustomerIoRequest($"v1/campaigns/{campaignTranslationRequest.CampaignId}/actions", Method.Get,

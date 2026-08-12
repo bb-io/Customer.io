@@ -5,6 +5,7 @@ using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using Blackbird.Applications.Sdk.Utils.RestSharp;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 
 namespace Apps.Customer.io.Api;
@@ -18,19 +19,35 @@ public class CustomerIoClient(IEnumerable<AuthenticationCredentialsProvider> cre
 
     protected override Exception ConfigureErrorException(RestResponse response)
     {
-        if (string.IsNullOrEmpty(response.Content))
-        {
-            if (response.ErrorMessage != null)
-            {
-                throw new PluginApplicationException(response.ErrorMessage);
-            }
-        }
-        
-        var content = response.Content!;
-        var error = JsonConvert.DeserializeObject<ErrorResponse>(content)!;
+        var content = response.Content;
 
-        return error.Errors is not null 
-            ? new PluginApplicationException(string.Join(';', error.Errors.Select(x => $"Status: {x.Status}, Details: {x.Detail}; "))) 
-            : new PluginApplicationException(error.Meta?.Error ?? content);
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return new PluginApplicationException(response.ErrorMessage
+                ?? $"Request failed with status code {(int)response.StatusCode} ({response.StatusDescription}).");
+        }
+
+        var error = TryParseError(content);
+        if (error?.Errors is not null && error.Errors.Any())
+        {
+            return new PluginApplicationException(
+                string.Join("; ", error.Errors.Select(x => $"Status: {x.Status}, Details: {x.Detail}")));
+        }
+
+        return new PluginApplicationException(error?.Meta?.Error ?? content);
+    }
+
+    private static ErrorResponse? TryParseError(string content)
+    {
+        try
+        {
+            return JToken.Parse(content) is JObject errorObject
+                ? errorObject.ToObject<ErrorResponse>(JsonSerializer.Create(JsonConfig.Settings))
+                : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 }

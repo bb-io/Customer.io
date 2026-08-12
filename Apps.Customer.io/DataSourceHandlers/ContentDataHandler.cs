@@ -3,6 +3,7 @@ using Apps.Customer.io.Invocables;
 using Apps.Customer.io.Models.Request.Content;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Customer.io.DataSourceHandlers;
@@ -14,7 +15,7 @@ public class ContentDataHandler(InvocationContext invocationContext, [ActionPara
     {
         if (string.IsNullOrEmpty(contentRequest.ContentType))
         {
-            throw new Exception("Please, provide 'Content type' input first");
+            throw new PluginMisconfigurationException("Please, provide 'Content type' input first");
         }
 
         var dataHandler = GetDataHandlerForContentType(contentRequest.ContentType);
