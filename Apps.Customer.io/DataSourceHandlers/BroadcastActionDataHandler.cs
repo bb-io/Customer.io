@@ -4,6 +4,7 @@ using Apps.Customer.io.Models.Request.Broadcast;
 using Apps.Customer.io.Models.Response.Broadcast;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using RestSharp;
 
@@ -20,7 +21,7 @@ public class BroadcastActionDataHandler(
     {
         if (string.IsNullOrWhiteSpace(BroadcastId))
         {
-            throw new("You have to input Broadcast first");
+            throw new PluginMisconfigurationException("You have to input Broadcast first");
         }
 
         var request = new CustomerIoRequest($"v1/broadcasts/{BroadcastId}/actions", Method.Get, Creds);

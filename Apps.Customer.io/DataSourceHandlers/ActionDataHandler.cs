@@ -2,6 +2,7 @@
 using Apps.Customer.io.Models.Request.Content;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Customer.io.DataSourceHandlers;
@@ -14,12 +15,12 @@ public class ActionDataHandler(InvocationContext invocationContext, [ActionParam
     {
         if (string.IsNullOrEmpty(contentRequest.ContentType))
         {
-            throw new Exception("Please, provide 'Content type' input first");
+            throw new PluginMisconfigurationException("Please, provide 'Content type' input first");
         }
 
         if (string.IsNullOrEmpty(contentRequest.ContentId))
         {
-            throw new Exception("Please, provide 'Content ID' input first");
+            throw new PluginMisconfigurationException("Please, provide 'Content ID' input first");
         }
 
         var dataHandler = GetDataHandlerForContentType(contentRequest.ContentType, contentRequest.ContentId);
