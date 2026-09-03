@@ -25,8 +25,8 @@ public class NewsletterService(InvocationContext invocationContext)
 {
     public async Task<Stream> DownloadContentAsync(ContentRequest downloadInput)
     {
-        if (string.IsNullOrWhiteSpace(downloadInput.Language))
-            throw new PluginMisconfigurationException("Language is required for Newsletters");
+        //if (string.IsNullOrWhiteSpace(downloadInput.Language))
+        //    throw new PluginMisconfigurationException("Language is required for Newsletters");
 
         string endpoint = $"v1/newsletters/{downloadInput.ContentId}/language/{downloadInput.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
