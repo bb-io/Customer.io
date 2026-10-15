@@ -1,4 +1,5 @@
-﻿using Blackbird.Applications.Sdk.Common.Invocation;
+﻿using Blackbird.Applications.Sdk.Common.Exceptions;
+using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.Customer.io.Services.Factories;
 
@@ -13,7 +14,7 @@ public class ContentServiceFactory(InvocationContext invocationContext)
             "broadcast_message" => new BroadcastMessageService(invocationContext),
             "transactional_message" => new TransactionalMessageService(invocationContext),
             "design_studio_email" => new DesignStudioEmailService(invocationContext),
-            _ => throw new Exception($"Couldn't find content type service for given content type: {contentType}")
+            _ => throw new PluginMisconfigurationException($"Couldn't find content type service for given content type: {contentType}")
         };
     }
 }
