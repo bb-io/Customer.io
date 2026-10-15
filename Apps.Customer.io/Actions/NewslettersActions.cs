@@ -151,9 +151,9 @@ public class NewslettersActions(InvocationContext invocationContext, IFileManage
         var endpoint = $"v1/campaigns/{input.CampaignId}/actions/{input.ActionId}/language/{input.Language}";
         
         await using var htmlStream = await fileManagementClient.DownloadAsync(updateRequest.File);
-        var uploadStream = await FileTransformer.ToHtml(htmlStream, updateRequest.File);
+        string htmlString = await FileTransformer.ToHtmlString(htmlStream, updateRequest.File);
         
-        var campaignMessageEntity = CampaignMessageConverter.ToCampaignMessageEntity(uploadStream);
+        var campaignMessageEntity = CampaignMessageConverter.ToCampaignMessageEntity(htmlString);
         var request = new CustomerIoRequest(endpoint, Method.Put, Creds)
             .WithJsonBody(new
             {

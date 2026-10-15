@@ -7,5 +7,5 @@ namespace Apps.Customer.io.Services;
 public interface IContentService
 {
     public Task<Stream> DownloadContentAsync(ContentRequest downloadInput);
-    public Task<ContentResponse> UploadContentAsync(Stream htmlStream, ContentUploadInput uploadInput);
+    public Task<ContentResponse> UploadContentAsync(string content, ContentUploadInput input);
 }

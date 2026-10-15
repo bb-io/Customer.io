@@ -83,25 +83,22 @@ public class BroadcastMessageService(InvocationContext invocationContext)
         return new MemoryStream(Encoding.UTF8.GetBytes(modifiedHtml));
     }
 
-    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, ContentUploadInput uploadInput)
+    public async Task<ContentResponse> UploadContentAsync(string content, ContentUploadInput uploadInput)
     {
-        var bytes = await htmlStream.GetByteData();
-        var htmlString = Encoding.Default.GetString(bytes);
-
         string? language = uploadInput.Language;
 
-        if (htmlString.IsJson())
+        if (content.IsJson())
         {
-            var content = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(htmlString);
-            if (content is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
+            var jsonContent = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(content);
+            if (jsonContent is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
             var entity = await UpdateBroadcastTranslation(new BroadcastActionRequest()
             {
-                BroadcastId = content.ContentId ?? throw new PluginApplicationException("Missing 'contentId' in the uploaded JSON."),
-                ActionId = content.ActionId ?? throw new PluginApplicationException("Missing 'actionId' in the uploaded JSON."),
+                BroadcastId = jsonContent.ContentId ?? throw new PluginApplicationException("Missing 'contentId' in the uploaded JSON."),
+                ActionId = jsonContent.ActionId ?? throw new PluginApplicationException("Missing 'actionId' in the uploaded JSON."),
                 Language = language
             }, new()
             {
-                Body = content.Body?.ToString()
+                Body = jsonContent.Body?.ToString()
             });
 
             return new()
@@ -115,7 +112,7 @@ public class BroadcastMessageService(InvocationContext invocationContext)
         }
 
         var doc = new HtmlDocument();
-        doc.LoadHtml(htmlString);
+        doc.LoadHtml(content);
 
         var contentIdNode = doc.DocumentNode.SelectSingleNode($"//meta[@name='{HtmlConstants.ContentId}']");
         var actionIdNode = doc.DocumentNode.SelectSingleNode($"//meta[@name='{HtmlConstants.ActionId}']");
@@ -136,7 +133,7 @@ public class BroadcastMessageService(InvocationContext invocationContext)
             Language = language
         }, new()
         {
-            Body = htmlString
+            Body = content
         });
 
         return new()

@@ -1,0 +1,108 @@
+<html lang='en-US'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta name='blackbird-content-id' content='cdbf6db0-3400-4d38-8316-7277d0567d7b'>
+    <meta name='blackbird-content-type' content='design_studio_email'>
+    <title>not blank</title></head>
+<body>
+<div id='subject'>not blank</div>
+<div id='preheader'>preheader text</div>
+<div id='content'>
+    <x-base :background="{ light: `#f0edeb`, dark: `#333333` }" lang="en-us" dir="ltr" title="Welcome to Design Studio"
+            color="#08272b" background="#f0edeb" color-scheme="light dark">
+        <x-section border-radius="8px 8px 8px 8px" border-color="#dcd8d5" margin="16px" padding="32px"
+                   :background="{ light: `#ffffff`, dark: `#eeeeee` }" outer-background="" border-style="solid"
+                   width="620px">
+            <x-image align="center" width="32px"
+                     src="https://userimg-assets.customeriomail.com/images/client-env-138234/1712267461013_logo-footer_01HTNHG0HTRAZ1T02C5VGMNJ14.png"
+                     margin="8px 0"></x-image>
+            <x-heading-1 text-align="center" margin="0px 0px 20px" color="#0e464d" font-weight="600">Welcome to Design111
+                Studio
+            </x-heading-1>
+            <x-box :background="{ light: `#eff2e9`, dark: `#0b353b` }"
+                   :color="{ light: `rgb(8, 39, 43)`, dark: `#eff2e9` }" margin="32px 0px 40px"
+                   border-radius="4px 4px 4px 4px" padding="16px">
+                <x-paragraph :font-size="16" margin="0px 0px 16px">This is a simple demo email you can make your own.
+                    Start by adding your own brand styles to Global Styles, and see how this email changes.
+                </x-paragraph>
+                <x-cta :color="{ light: `#e4ffce`, dark: `#0b353b` }"
+                       :background="{ light: `#0b353b`, dark: `#e4ffce` }"
+                       href="https://fly.customer.io/workspaces/228357/design-studio/global-styles" padding="4px 20px"
+                       hover-color="#ffffff" hover-background="#138563" border-radius="28px 28px 28px 28px" align="left"
+                       font-weight="600">Add Branding
+                </x-cta>
+            </x-box>
+            <x-row align="center" margin="0px 0px 64px" padding="0px" :break-point="400" :gap="24"
+                   :layout='[40,"auto"]'>
+                <x-column>
+                    <x-image border-color="#dcd8d5" border-style="solid" border-radius="4px 4px 4px 4px" align="center"
+                             src="https://userimg-assets.customeriomail.com/images/client-env-138234/templates_01JN2FP508K55Z81BM7RNGQTTE.png"
+                             width="100%"></x-image>
+                </x-column>
+                <x-column vertical-align="top">
+                    <x-heading-3 color="#0b353b" margin="0px">Save as template</x-heading-3>
+                    <x-paragraph margin="8px 0px 0px" :font-size="14">Compose and save a message as a template, then
+                        reuse it when you want.
+                    </x-paragraph>
+                </x-column>
+            </x-row>
+            <x-row align="center" margin="0px 0px 64px" padding="0px" :break-point="400" :gap="24"
+                   :layout='[40,"auto"]'>
+                <x-column border-radius="4px 4px 4px 4px" background="">
+                    <x-image border-color="#dcd8d5" border-style="solid" border-radius="4px 4px 4px 4px"
+                             src="https://userimg-assets.customeriomail.com/images/client-env-138234/1740619148594_preview_01JN2FRVATJ5WWDMTXEP56DZFJ.png"></x-image>
+                </x-column>
+                <x-column vertical-align="top">
+                    <x-heading-3 color="#0b353b" margin="0px">Catch design woes</x-heading-3>
+                    <x-paragraph margin="8px 0px 0px" :font-size="14">Preview your email with various visual impairment
+                        filters, device sizes, and emulate dark mode to QA design intricacies before you hit send.
+                    </x-paragraph>
+                    <x-paragraph margin="16px 0px 0px" color="#66787a" :line-height="1.3" hide="none" :font-size="12">
+                        Psst… looking for an easter egg? Preview this email on mobile to catch our hide/show
+                        functionality.
+                    </x-paragraph>
+                    <x-box border-radius="4px 4px 4px 4px" padding="24px" margin="0px" hide="medium" height="auto"
+                           background="url('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHlybjN4dW93M3d1OWpvdTk1aGZwZXMyaWM0NWllem84bGh3OWE0ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/oB6nlaw4QJ8TS/giphy.gif') left top / cover no-repeat">
+                        <x-heading-3 margin="32px 0px 2px" color="#f7f4f3">Oh hey!</x-heading-3>
+                        <x-paragraph color="#f7f4f3" margin="0px">I'm only on mobile.</x-paragraph>
+                    </x-box>
+                </x-column>
+            </x-row>
+            <x-row margin="0px 0px 64px" :break-point="400" padding="0px" :gap="24" :layout='[40,"auto"]'>
+                <x-column>
+                    <x-image border-color="#dcd8d5" border-style="solid" border-radius="4px 4px 4px 4px" align="center"
+                             src="https://userimg-assets.customeriomail.com/images/client-env-138234/customize_01JN6W0DRER99S2CJ74MQ3GMF2.png"
+                             width="100%"></x-image>
+                </x-column>
+                <x-column vertical-align="top">
+                    <x-heading-3 color="#0b353b" margin="0px">Customization without complexity</x-heading-3>
+                    <x-paragraph margin="8px 0px 0px" :font-size="14">You don't need to know code to support emails'
+                        various intricacies. Add fallback fonts to your custom fonts, create rounded buttons without
+                        fussing over VML, and quickly adjust images without needing to specify pixels manually—all from
+                        our visual editor.
+                    </x-paragraph>
+                </x-column>
+            </x-row>
+            <x-box border-radius="4px 4px 4px 4px" border-color="#dcd8d5" border-width="1px" background=""
+                   margin="0px 0px 40px" padding="0px" border-style="solid" align="center">
+                <x-image border-radius="4px 4px 0px 0px" hide="small"
+                         src="https://userimg-assets.customeriomail.com/images/client-env-138234/switch-code_01JNM5AAG99H4M35743P6ESE44.png"
+                         align="center" width="auto"></x-image>
+                <x-heading-3 color="#0b353b" margin="16px 16px 0px">Need a code editor?</x-heading-3>
+                <x-paragraph :font-size="14" margin="8px 16px 16px">Switch into code to make edits or add in any custom
+                    code you need.
+                </x-paragraph>
+            </x-box>
+            <x-paragraph text-align="center" margin="32px 0px 16px">Want to see a tour of the editor again?
+            </x-paragraph>
+            <x-cta href="https://fly.customer.io/workspaces/228357/design-studio/editor?tour=visual"
+                   border-radius="28px 28px 28px 28px" color="#08272b" hover-color="#ffffff" hover-background="#0b353b"
+                   border-color="#08272b" background="#ffffff" padding="4px 20px" align="center" font-weight="600"
+                   border-width="2px" border-style="solid">Replay Tour
+            </x-cta>
+        </x-section>
+    </x-base>
+</div>
+</body>
+</html>

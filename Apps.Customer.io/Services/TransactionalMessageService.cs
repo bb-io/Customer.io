@@ -48,9 +48,9 @@ public class TransactionalMessageService(InvocationContext invocationContext)
         return TransactionalMessageConverter.ToHtmlStream(response.Content, contentId);
     }
 
-    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, ContentUploadInput uploadInput)
+    public async Task<ContentResponse> UploadContentAsync(string content, ContentUploadInput uploadInput)
     {        
-        var campaignMessageEntity = TransactionalMessageConverter.ToTransactionalMessageEntity(htmlStream);
+        var campaignMessageEntity = TransactionalMessageConverter.ToTransactionalMessageEntity(content);
         var response = await UpdateTransactionalMessageTranslation(new()
         {
             TransactionalMessageId = campaignMessageEntity.Id,

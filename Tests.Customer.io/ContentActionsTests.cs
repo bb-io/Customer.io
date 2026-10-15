@@ -13,6 +13,23 @@ namespace Tests.Customer.io;
 public class ContentActionsTests : TestBase
 {
     [TestMethod]
+    public async Task DownloadContent_ValidBroadcastId_ShouldDownloadValidHtmlFile()
+    {
+        var contentActions = new ContentActions(InvocationContext, FileManagementClient);
+        var request = new ContentRequest
+        {
+            ContentId = "1",
+            ActionId = "4",
+            ContentType = ContentTypes.BroadcastMessage,
+        };
+        
+        var result = await contentActions.DownloadContentAsync(request);
+        
+        Assert.IsNotNull(result);
+        Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+    }
+    
+    [TestMethod]
     public async Task DownloadContent_ValidNewsletterId_ShouldDownloadValidHtmlFile()
     {
         var contentActions = new ContentActions(InvocationContext, FileManagementClient);

@@ -12,7 +12,6 @@ using Blackbird.Applications.Sdk.Utils.Extensions.Http;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using RestSharp;
-using System.Text;
 using Apps.Customer.io.Models.Entity.Content;
 using Apps.Customer.io.Models.Request.Content;
 using Apps.Customer.io.Services.Models;
@@ -25,9 +24,6 @@ public class NewsletterService(InvocationContext invocationContext)
 {
     public async Task<Stream> DownloadContentAsync(ContentRequest downloadInput)
     {
-        //if (string.IsNullOrWhiteSpace(downloadInput.Language))
-        //    throw new PluginMisconfigurationException("Language is required for Newsletters");
-
         string endpoint = $"v1/newsletters/{downloadInput.ContentId}/language/{downloadInput.Language}";
         var request = new CustomerIoRequest(endpoint, Method.Get, Creds);
         var response = await Client.ExecuteWithErrorHandling<NewsletterTranslationResponse>(request);
@@ -43,25 +39,23 @@ public class NewsletterService(InvocationContext invocationContext)
         });
     }
 
-    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, ContentUploadInput uploadInput)
+    public async Task<ContentResponse> UploadContentAsync(string content, ContentUploadInput uploadInput)
     {
-        var htmlString = await new StreamReader(htmlStream, Encoding.UTF8).ReadToEndAsync();
-
         var payload = new UpdateNewsletterTranslationEntity();
         var contentId = string.Empty;
 
-        if (htmlString.IsJson())
+        if (content.IsJson())
         {
-            var content = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(htmlString);
-            if (content is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
-            payload.Subject = content.Subject ?? content.Name?.ToString();
-            payload.PreheaderText = content.PreheaderText;
-            payload.Body = content.Body?.ToString();
-            contentId = content.ContentId;
+            var jsonContent = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(content);
+            if (jsonContent is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
+            payload.Subject = jsonContent.Subject ?? jsonContent.Name?.ToString();
+            payload.PreheaderText = jsonContent.PreheaderText;
+            payload.Body = jsonContent.Body?.ToString();
+            contentId = jsonContent.ContentId;
         } else
         {
             var doc = new HtmlDocument();
-            doc.LoadHtml(htmlString);
+            doc.LoadHtml(content);
 
             var contentIdNode = doc.DocumentNode.SelectSingleNode("//meta[@name='blackbird-content-id']");
             contentId = contentIdNode?.GetAttributeValue("content", string.Empty) ??
