@@ -1,4 +1,3 @@
-using System.Text;
 using Apps.Customer.io.Api;
 using Apps.Customer.io.Constants;
 using Apps.Customer.io.Invocables;
@@ -40,20 +39,19 @@ public class DesignStudioEmailService(InvocationContext context) : CustomerIoInv
         });
     }
 
-    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, ContentUploadInput uploadInput)
+    public async Task<ContentResponse> UploadContentAsync(string content, ContentUploadInput input)
     {
-        if (string.IsNullOrWhiteSpace(uploadInput.Language))
+        if (string.IsNullOrWhiteSpace(input.Language))
             throw new PluginMisconfigurationException("Language is required for Design Studio emails");
 
-        var fileContent = await new StreamReader(htmlStream, Encoding.UTF8).ReadToEndAsync();
-        var (fileContentId, document) = fileContent.IsJson() ? ParseJson(fileContent) : ParseHtml(fileContent);
+        var (fileContentId, document) = content.IsJson() ? ParseJson(content) : ParseHtml(content);
         
         string contentId = 
-            uploadInput.ContentId ?? 
+            input.ContentId ?? 
             fileContentId ?? 
             throw new PluginMisconfigurationException(ExceptionMessages.CouldntFindContentIdInHtml);
         
-        string endpoint = $"v1/design_studio/emails/{contentId}/languages/{uploadInput.Language}";
+        string endpoint = $"v1/design_studio/emails/{contentId}/languages/{input.Language}";
         var updateRequest = new CustomerIoRequest(endpoint, Method.Put, Creds)
             .WithJsonBody(new
             {
@@ -73,7 +71,7 @@ public class DesignStudioEmailService(InvocationContext context) : CustomerIoInv
 
         return new ContentResponse
         {
-            ContentId = fileContentId,
+            ContentId = contentId,
             Name = entity.Content.Subject,
             ContentType = ContentTypes.DesignStudioEmail,
             CreatedAt = DateTimeOffset.FromUnixTimeSeconds(entity.Created).UtcDateTime,

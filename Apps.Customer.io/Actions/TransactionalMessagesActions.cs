@@ -64,9 +64,9 @@ public class TransactionalMessagesActions(InvocationContext invocationContext, I
         [ActionParameter] FileRequest fileRequest)
     {
         await using var fileStream = await fileManagementClient.DownloadAsync(fileRequest.File);
-        var uploadStream = await FileTransformer.ToHtml(fileStream, fileRequest.File);
+        string uploadContent = await FileTransformer.ToHtmlString(fileStream, fileRequest.File);
         
-        var campaignMessageEntity = TransactionalMessageConverter.ToTransactionalMessageEntity(uploadStream);
+        var campaignMessageEntity = TransactionalMessageConverter.ToTransactionalMessageEntity(uploadContent);
         return await UpdateTransactionalMessageTranslation(input, new UpdateMessageTranslationRequest
         {
             Body = campaignMessageEntity.Body

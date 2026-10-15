@@ -5,7 +5,6 @@ using Blackbird.Applications.Sdk.Common.Exceptions;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using System.Text;
-using System.Web;
 
 namespace Apps.Customer.io.Utils.Converters;
 
@@ -95,26 +94,23 @@ public static class CampaignMessageConverter
         return new MemoryStream(Encoding.UTF8.GetBytes(htmlString));
     }
 
-    public static CampaignMessageEntity ToCampaignMessageEntity(Stream htmlStream)
+    public static CampaignMessageEntity ToCampaignMessageEntity(string content)
     {
-        using var reader = new StreamReader(htmlStream, Encoding.UTF8);
-        var htmlContent = reader.ReadToEnd();
-
-        if (htmlContent.IsJson())
+        if (content.IsJson())
         {
-            var content = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(htmlContent);
-            if (content is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
+            var jsonContent = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(content);
+            if (jsonContent is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
 
             return new CampaignMessageEntity(
-                content.ContentId ?? throw new PluginApplicationException("Missing 'contentId' in the uploaded JSON."), 
-                content.ActionId ?? throw new PluginApplicationException("Missing 'actionId' in the uploaded JSON."),
-                content.Name?.ToString() ?? throw new PluginApplicationException("Missing 'name' in the uploaded JSON."),
-                content.Body ?? throw new PluginApplicationException("Missing 'body' in the uploaded JSON."),
+                jsonContent.ContentId ?? throw new PluginApplicationException("Missing 'contentId' in the uploaded JSON."), 
+                jsonContent.ActionId ?? throw new PluginApplicationException("Missing 'actionId' in the uploaded JSON."),
+                jsonContent.Name?.ToString() ?? throw new PluginApplicationException("Missing 'name' in the uploaded JSON."),
+                jsonContent.Body ?? throw new PluginApplicationException("Missing 'body' in the uploaded JSON."),
                 string.Empty, string.Empty);
         }
 
         var htmlDoc = new HtmlDocument();
-        htmlDoc.LoadHtml(htmlContent);
+        htmlDoc.LoadHtml(content);
 
         var contentIdNode = htmlDoc.DocumentNode.SelectSingleNode($"//meta[@name='{HtmlConstants.ContentId}']");
         var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//title");

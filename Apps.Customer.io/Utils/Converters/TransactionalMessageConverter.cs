@@ -46,26 +46,23 @@ public static class TransactionalMessageConverter
         return new MemoryStream(byteArray);
     }
 
-    public static EmailTemplateEntity ToTransactionalMessageEntity(Stream htmlStream)
+    public static EmailTemplateEntity ToTransactionalMessageEntity(string content)
     {
-        using var reader = new StreamReader(htmlStream, Encoding.UTF8);
-        var htmlContent = reader.ReadToEnd();
-
-        if (htmlContent.IsJson())
+        if (content.IsJson())
         {
-            var content = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(htmlContent);
-            if (content is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
+            var jsonContent = JsonConvert.DeserializeObject<JsonResponseWithMetadata>(content);
+            if (jsonContent is null) throw new PluginMisconfigurationException("No Custom.io content found in uploaded file");
 
             return new EmailTemplateEntity
             {
-                Id = content.ContentId ?? throw new PluginApplicationException("Missing 'contentId' in the uploaded JSON."),
-                Name = content.Name?.ToString() ?? throw new PluginApplicationException("Missing 'name' in the uploaded JSON."),
-                Body = content.ToString() ?? throw new PluginApplicationException("Missing 'body' in the uploaded JSON."),
+                Id = jsonContent.ContentId ?? throw new PluginApplicationException("Missing 'contentId' in the uploaded JSON."),
+                Name = jsonContent.Name?.ToString() ?? throw new PluginApplicationException("Missing 'name' in the uploaded JSON."),
+                Body = jsonContent.Body?.ToString() ?? throw new PluginApplicationException("Missing 'body' in the uploaded JSON."),
             };
         }
 
         var htmlDoc = new HtmlDocument();
-        htmlDoc.LoadHtml(htmlContent);
+        htmlDoc.LoadHtml(content);
 
         var contentIdNode = htmlDoc.DocumentNode.SelectSingleNode($"//meta[@name='{HtmlConstants.ContentId}']");
         var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//title");

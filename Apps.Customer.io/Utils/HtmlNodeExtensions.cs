@@ -10,4 +10,11 @@ public static class HtmlNodeExtensions
         headNode.AppendChild(HtmlNode.CreateNode(
             $"<meta name='{name}' content='{System.Net.WebUtility.HtmlEncode(value)}'>"));
     }
+
+    public static string? GetMeta(this HtmlDocument doc, string metaName)
+    {
+        return doc.DocumentNode
+            .SelectSingleNode($"//meta[@name='{metaName}']")?
+            .GetAttributeValue("content", string.Empty);
+    }
 }

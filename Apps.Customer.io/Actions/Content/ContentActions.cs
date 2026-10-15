@@ -14,7 +14,9 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using RestSharp;
 using System.Net.Mime;
+using Apps.Customer.io.Services.Models;
 using Apps.Customer.io.Utils;
+using Apps.Customer.io.Utils.ContentType;
 
 namespace Apps.Customer.io.Actions.Content;
 
@@ -47,16 +49,20 @@ public class ContentActions(InvocationContext invocationContext, IFileManagement
     [Action("Upload content", Description = "Update content from file")]
     public async Task<ContentResponse> UploadContent([ActionParameter] UploadContentRequest uploadContentRequest)
     {
-        if (String.IsNullOrEmpty(uploadContentRequest.Language) && (!uploadContentRequest.UpdateSource.HasValue || uploadContentRequest.UpdateSource.Value == false))
+        if (string.IsNullOrEmpty(uploadContentRequest.Language) && uploadContentRequest.UpdateSource is null or false)
         {
-            throw new PluginMisconfigurationException("Language input cannot be empty, unless you want to update the source content. In that case, set Update source to true.");
+            throw new PluginMisconfigurationException(
+                "Language input cannot be empty, unless you want to update the source content. " +
+                "In that case, set Update source to true.");
         }
 
-        var service = _contentServiceFactory.GetService(uploadContentRequest.ContentType);
         await using var fileStream = await fileManagementClient.DownloadAsync(uploadContentRequest.File);
-        var uploadStream = await FileTransformer.ToHtml(fileStream, uploadContentRequest.File);
+        string fileContent = await FileTransformer.ToHtmlString(fileStream, uploadContentRequest.File);
 
-        return await service.UploadContentAsync(uploadStream, uploadContentRequest.ToUploadInput());
+        string contentType = ContentTypeResolver.Resolve(fileContent, uploadContentRequest.ContentType);
+        var service = _contentServiceFactory.GetService(contentType);
+
+        return await service.UploadContentAsync(fileContent, new ContentUploadInput(uploadContentRequest));
     }
 
     [Action("Search campaigns", Description = "Returns all campaigns in the workspace")]

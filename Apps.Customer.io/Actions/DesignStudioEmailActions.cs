@@ -45,11 +45,10 @@ public class DesignStudioEmailActions(InvocationContext invocationContext, IFile
     public async Task<ContentResponse> UpdateDesignStudioEmail([ActionParameter] UploadDesignStudioEmailRequest input)
     {
         await using var fileStream = await fileManagementClient.DownloadAsync(input.File);
-        var uploadStream = await FileTransformer.ToHtml(fileStream, input.File);
+        string uploadFile = await FileTransformer.ToHtmlString(fileStream, input.File);
 
-        return await _service.UploadContentAsync(uploadStream, new ContentUploadInput()
+        return await _service.UploadContentAsync(uploadFile, new ContentUploadInput()
         {
-            ContentType = ContentTypes.DesignStudioEmail,
             ContentId = input.EmailId,
             Language = input.Language,
         });

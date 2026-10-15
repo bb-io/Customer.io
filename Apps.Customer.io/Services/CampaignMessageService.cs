@@ -55,11 +55,11 @@ public class CampaignMessageService(InvocationContext invocationContext)
         return CampaignMessageConverter.ToHtmlStream(response, actionId);
     }
 
-    public async Task<ContentResponse> UploadContentAsync(Stream htmlStream, ContentUploadInput uploadInput)
+    public async Task<ContentResponse> UploadContentAsync(string content, ContentUploadInput uploadInput)
     {
         string? actionId = uploadInput.ActionId;
         
-        var campaignMessageEntity = CampaignMessageConverter.ToCampaignMessageEntity(htmlStream);
+        var campaignMessageEntity = CampaignMessageConverter.ToCampaignMessageEntity(content);
         var actualActionId = string.IsNullOrEmpty(actionId) ? campaignMessageEntity.ActionId : actionId;
         if(string.IsNullOrEmpty(actualActionId))
         {

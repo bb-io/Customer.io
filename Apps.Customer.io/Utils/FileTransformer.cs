@@ -1,3 +1,4 @@
+using System.Text;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
@@ -23,5 +24,12 @@ public static class FileTransformer
         return !targetLoadResult.Success 
             ? throw new PluginMisconfigurationException(targetLoadResult.Error) 
             : targetLoadResult.Value.ToStream();
+    }
+
+    public static async Task<string> ToHtmlString(Stream fileStream, FileReference inputFile)
+    {
+        await using var stream = await ToHtml(fileStream, inputFile);
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        return await reader.ReadToEndAsync();
     }
 }
