@@ -116,7 +116,7 @@ public static class CampaignMessageConverter
         var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//title");
 
         var actionIdNode = htmlDoc.DocumentNode.SelectSingleNode($"//meta[@name='{HtmlConstants.ActionId}']");
-        var actionId = actionIdNode is null ? "" : actionIdNode.InnerText;
+        string actionId = actionIdNode?.GetAttributeValue("content", string.Empty) ?? string.Empty;
 
         var name = titleNode != null ? System.Net.WebUtility.HtmlDecode(titleNode.InnerText) : string.Empty;
         var contentId = contentIdNode?.GetAttributeValue("content", string.Empty) ??
